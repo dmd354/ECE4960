@@ -211,20 +211,75 @@
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true"><i class="fas fa-times"></i></span>
                     </button>
-                    <div class="modal-body text-center">
+                    <div class="modal-body">
                         <div class="container">
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
                                     <!-- Lab Modal - Title-->
-                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0" id="portfolioModal1Label">Lab 01</h2>
+                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0 text-center" id="portfolioModal1Label">Lab 01</h2>
                                     <!-- Icon Divider-->
                                     <div class="divider-custom">
                                         <div class="divider-custom-line"></div>
                                     </div>
-                                    <!-- Lab Modal - Image-->
-                                    <!--<img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="" />-->
-                                    <!-- Lab Modal - Text-->
-                                    <p class="mb-5">Coming soon...</p>
+									<h3>Part A: The Artemis Board</h3>
+									<br>
+									<p>The “Blink It Up!” example was run and the LED was observed to blink as expected. The baud rate did not need to be lowered from the default (921600 baud). The blinking LED can be seen in the video below.</p>									
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/sE-EbIqZAKE" allowfullscreen></iframe>
+									</div>
+									<br>
+									<p>The code for “Example2_Serial” was downloaded to the board to verify that the serial port works. The video below shows the code being downloaded and then communication is done to and from the board in the serial monitor on the right half of the screen.</p>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/78Omi8RaHZ0" allowfullscreen></iframe>
+									</div>
+									<br>
+									<p>The code for “Example4_analogRead” was downloaded to the board to ensure that the board was able to read analog input from the temperature sensor. The video below shows the analog data being read from the board. During this data collection, the Artemis board was held and breathed on to warm it up. It can be seen that the internal temperature measurement started around 27°C and increased to around 32°C.</p>
+									<br>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/kRN5F9_FWdw" allowfullscreen></iframe>
+									</div>
+									<br>
+									<p>When the “Example1_MicrophoneOutput” code was initially run, the serial monitor printed a seemingly random collection of symbols indicating some sort of communication error. This bad output can be seen below.</p>
+									<br>
+									<img class="img-fluid rounded mb-5" src="lab01/BAD_OUTPUT.PNG" alt="" />
+									<br>
+									<p>To fix this issue, the baud rate on the serial monitor was adjusted to match that specified in the code (115200 baud). The desired output was then printed correctly. The changing loudest frequency value was observed when talking near the board and when loud vehicles would drive past the nearby window. The functionality of this code running on the hardware was further tested using a tone generator found online. This can be seen in the video below where it can be observed that the program detects a range of frequencies reasonably well.</p>
+									<br>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/4t4gaoOknZM" allowfullscreen></iframe>
+									</div>
+									<br>
+									<p>By watching the Loudest Frequency value change while whistling was attempted, an approximate whistle frequency range was determined to be 750Hz to 1500Hz. The “Example1_MicrophoneOutput” code was slightly modified to light the LED when whistling was detected. This was accomplished by first adding the following line to the setup function to set the LED pin to be an output.</p>
+									<pre><code>
+pinMode(LED_BUILTIN, OUTPUT); // initialize digital pin LED_BUILTIN as an output
+									</code></pre>
+									<p>Then in the function that prints the loudest frequency, before printing, the frequency is checked to see if it is in the whistle range, and if so, the LED is turned on and a message is printed indicating that a whistle was detected. Otherwise, the LED is turned off, and the normal message is printed. This was accomplished with the following lines of code:</p>
+									<pre><code>
+if(ui32LoudestFrequency>750 && ui32LoudestFrequency<1500) // if sound is in my whistle range
+{
+	digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+	Serial.printf("Loudest frequency: %d    WHISTLE DETECTED\n", ui32LoudestFrequency);
+}
+else
+{
+	digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+	Serial.printf("Loudest frequency: %d         \n", ui32LoudestFrequency);
+									</code></pre>
+									
+									<p>The operation of this code can be seen in the video below. The video also shows that the Artemis board is operating with power from the battery instead of the USB cable.</p>
+									<br>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/GOCP1CXYj44" allowfullscreen></iframe>
+									</div>
+									
+									<br>
+									<br>
+									<h3>Part B: Virtual Machine Setup</h3>
+									<br>
+									<p>A virtual machine was added to VirtualBox by copying the provided  OVA file. The image below shows the VirtualBox manager window with the virtual machine to be used in this class selected. The preview window in the image also shows the desktop of the virtual machine to which a Guest Additions CD Image and a shared folder have been added.</p>
+									<br>
+									<img class="img-fluid rounded mb-5" src="lab01/VirtualBox.PNG" alt="" />
+									<br>
                                     <button class="btn btn-dark" data-dismiss="modal">
                                         <i class="fas fa-times fa-fw"></i>
                                         Close Window
