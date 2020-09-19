@@ -303,7 +303,7 @@ else
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true"><i class="fas fa-times"></i></span>
                     </button>
-                    <div class="modal-body text-center">
+                    <div class="modal-body">
                         <div class="container">
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
@@ -313,10 +313,133 @@ else
                                     <div class="divider-custom">
                                         <div class="divider-custom-line"></div>
                                     </div>
-                                    <!-- Lab Modal - Image-->
-                                    <!--<img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="" />-->
-                                    <!-- Lab Modal - Text-->
-                                    <p class="mb-5">Coming soon...</p>
+									<h3>Abstract</h3>
+									<br>
+									<p>In this Lab, Bluetooth communication was established between my computer and the artemis board. This came with a large number of challenges, and the host OS had to be used instead of the virtual machine. However, a connection was established, and data was able to be transferred.</p>									
+									<br>
+									<h3>Connecting to the Artemis Board</h3>
+									<br>
+									<p>The first few times main.py was run in the virtual machine the following error appeared:</p>									
+									<br>
+									<img class="img-fluid mb-5" src="Lab02/img/1.png" alt="" />
+									<br>
+									<p>Then after unplugging and plugging back in the Bluetooth adapter several times, the following error message was printed:</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab02/img/2.png" alt="" />
+									<br>
+									<p>he VM was restarted twice and the USB Bluetooth Adapter was moved to a different port on the PC, and the board was able to be found. In settings.py, the MAC address was added to Settings["cached"]. When this was done, and main.py was run again, the LED on the Artemis board would blink on and off indicating that a connection had been made.</p>
+									<br>
+									<p>Around this point, the Artemis board began to act unresponsive and was found to be getting stuck on line 136 of the distributed Arduino sketch. This issue fixed itself some time later for no apparent reason, then began acting up the next day only to fix itself again.</p>
+									<br>
+									<p>Unfortunately, after this point running main.py resulted in one of the following two error messages.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab02/img/3.png" alt="" />
+									<img class="img-fluid mb-5" src="Lab02/img/4.png" alt="" />
+									<br>
+									<p>The first one seemed to not occur when I could get the VM to recognize the USB adapter by unplugging it and plugging it back in to another port. The second error could not be diagnosed, and the rest of the lab was done on the host machine (Windows 10).</p>
+									<br>
+									<p>After downloading Python and Bleak on the host OS, main.py was run in the command prompt window. The following errors were found most times the script was run, but after several runs, the board connected. This inconsistency persisted through the rest of the lab.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab02/img/5.png" alt="" />
+									<br>
+									<h3>Pinging the Robot</h3>
+									<br>
+									<p>In main.py, pass was commented out and await theRobot.ping() was uncommented. Then main.py was run and the output was observed in the terminal. The terminal displayed round trip times, about 850 of these recorded times were copied and can be seen in the histogram below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab02/img/6.png" alt="" />
+									<br>
+									<p>It can be seen that  the largest number of pings took around 100-105ms. Of all of the data points, the average time was 101.25ms. The line <code>amdtpsSendData(m_Rcvd, l_Rcvd);</code> in the PING case shows that l_Rcvd is the length of the data being transmitted in the ping. The code was modified so that l_Rcvd would be printed in the serial monitor, and it was found to be 99. From this, it was calculated that on average the bluetooth transmission was about 15643 bits per second. This is significantly lower than the serial transmission used in this lab of 115200 baud (115200 bits/sec).</p>
+									<br>
+									<h3>Requesting a Float</h3>
+									<br>
+									<p>In main.py, <code>await theRobot.ping()</code> was commented out and <code>await theRobot.sendCommand(Commands.REQ_FLOAT)</code> was uncommented. Then the REQ_FLOAT case in the Arduino sketch was changed to the following:</p>
+									<br>
+									<pre><code>
+case REQ_FLOAT:
+	Serial.println("Going to send a float");
+	//TODO: Put a float (perhaps pi) into a command response and send it.
+	res_cmd->command_type = GIVE_FLOAT;     //set command type as GIVE_FLOAT
+	res_cmd->length=6;                      //length doesn't matter since the handler will take care of this
+	((float *)(res_cmd->data))[0] = 1.23f;  //put a float into data to send
+	amdtpsSendData((uint8_t *)res_cmd, 6);  //2 bytes for type and length, 4 bytes of data
+	break;
+									</code></pre>
+									<br>
+									<p>When run, the terminal showed the following output:</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab02/img/7.png" alt="" />
+									<br>
+									<p>The float displayed on the screen didn’t exactly match the float that was sent. This shows that data transmission over bluetooth isn’t perfect, and if floats are to be compared, the comparisons may not be accurate if the data was transmitted over bluetooth.</p>
+									<br>
+									<h3>Testing the Data Rate</h3>
+									<br>
+									<p>To transmit data, the following code was added to the main loop in the arduino sketch:</p>
+									<br>
+									<pre><code>
+if (bytestream_active)
+{
+	
+	res_cmd->command_type = BYTESTREAM_TX;  //set command type to bytestream transmit
+	res_cmd->length = 14;                    //length doesn't matter since the handler will take care of this
+	//TODO: Put an example of a 32-bit integer and a 64-bit integer
+	//for the stream. Be sure to add a corresponding case in the
+	//python program.
+	//Serial.printf("Stream %d \n", bytestream_active);
+	
+	((uint32_t *)(res_cmd->data))[0] = 32;  //put a 32 bit integer into data to send (4 bytes)
+	
+	uint64_t num = 64;
+	memcpy(res_cmd->data+4, &num, 8);       //put a 64 bit integer into data to send (8 bytes)
+	uint64_t num2 = 65;
+
+	// send a little data
+	//amdtpsSendData((uint8_t *)res_cmd, 14);  //2 bytes for type and length, 12 bytes of data
+
+	// send a lot of data
+	memcpy(res_cmd->data+12, &num2, 8);       //put a 64 bit integer into data to send (8 bytes)
+	uint64_t num3 = 66;
+	memcpy(res_cmd->data+20, &num3, 8);       //put a 64 bit integer into data to send (8 bytes)
+	uint64_t num4 = 67;
+	memcpy(res_cmd->data+28, &num4, 8);       //put a 64 bit integer into data to send (8 bytes)
+	uint64_t num5 = 68;
+	memcpy(res_cmd->data+36, &num5, 8);       //put a 64 bit integer into data to send (8 bytes)
+	uint64_t num6 = 69;
+	memcpy(res_cmd->data+44, &num6, 6);       //put a 64 bit integer into data to send (8 bytes)     
+	uint64_t num7 = 70;
+	memcpy(res_cmd->data+52, &num7, 8);       //put a 64 bit integer into data to send (8 bytes)
+	uint64_t num8 = 70;
+	memcpy(res_cmd->data+60, &num8, 8);       //put a 64 bit integer into data to send (8 bytes)
+	amdtpsSendData((uint8_t *)res_cmd, 70);  //2 bytes for type and length, 68 bytes of data
+	
+	//Print time
+	unsigned long t = micros();
+	Serial.printf("Package %d sent at %d us \n", pkg_count, t);
+	pkg_count++;
+}
+									</code></pre>
+									<br>
+									<p>In addition to this code, bytestream_active was set to 1 in the START_BYTESTREAM_TX case, and pkg count was initialized as a global variable with a value of 0. As it appears, the above code transmits a byte stream of one 32-bit integer and eight 64-bit integers (70-byte command), but if the line under <code>// send a little data</code> is uncommented and the 14 lines under <code>// send a lot of data</code> are commented out, the code will instead only transmit one 32 bit integer and one 64 bit integers (14-byte command). This code also has the board serial print every time a package is sent along with the time that it was sent. </p>
+									<br>
+									<p>In main.py, <code>await theRobot.sendCommand(Commands.START_BYTESTREAM_TX)</code> was added to myRobotTasks and all other commands were commented out. Additionally the following lines were added to the simpleHandler function:</p>
+									<br>
+									<pre><code>
+if (code == Commands.BYTESTREAM_TX.value):
+	print(unpack("&lt;Iqqqqqqqq", data))   #unpacks 1 4-byte int and 8 8-byte int 
+									</code></pre>
+									<br>
+									<p>The code above would print the package sent for the 70 byte command case. For the 14-byte case, <code>"&lt;Iq"</code> was used as the format string to indicate that data only includes one 4-byte number and one 8-byte number.</p>
+									<br>
+									<p>When the code was run for the 70-byte case, the output on the serial monitor and command line window looked like the following image.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab02/img/10.png" alt="" />
+									<br>
+									<p>From testing the code for both package cases, the histograms below were made for the amount of time that passed between each package being sent.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab02/img/8.png" alt="" />
+									<img class="img-fluid mb-5" src="Lab02/img/9.png" alt="" />
+									<br>
+									<p>It can be seen that the largest chunk of time was between 10.86 and 11.06ms for the smaller package, and between 11.14 and 11.34ms for the larger package. On average, the 14-byte packages were sent every 11.03ms and the 70-byte packages were sent every 11.16ms. This indicates that the larger packages sent slightly slower, but the difference is not significant. For the 14-byte test, 932 packages were sent, but the terminal only printed 811 of them indicating that about 13% of them were dropped. For the 70-byte test, 904 packages were sent, but the terminal only printed 766 of them indicating that about 15% of them were dropped.</p>
+									<br>
                                     <button class="btn btn-dark" data-dismiss="modal">
                                         <i class="fas fa-times fa-fw"></i>
                                         Close Window
