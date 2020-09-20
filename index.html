@@ -378,8 +378,7 @@ if (bytestream_active)
 	res_cmd->command_type = BYTESTREAM_TX;  //set command type to bytestream transmit
 	res_cmd->length = 14;                    //length doesn't matter since the handler will take care of this
 	//TODO: Put an example of a 32-bit integer and a 64-bit integer
-	//for the stream. Be sure to add a corresponding case in the
-	//python program.
+	//for the stream. Be sure to add a corresponding case in the python program.
 	//Serial.printf("Stream %d \n", bytestream_active);
 	
 	((uint32_t *)(res_cmd->data))[0] = 32;  //put a 32 bit integer into data to send (4 bytes)

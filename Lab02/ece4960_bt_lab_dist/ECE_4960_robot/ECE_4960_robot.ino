@@ -46,6 +46,7 @@ String s_Rcvd = "100"; //KHE declare extern in BLE_example_funcs.cpp to accept m
 uint16_t l_Rcvd = 0;
 uint8_t *m_Rcvd = NULL;
 String s_AdvName = "MyRobot"; //KHE 2 0 TOTAL CHARACHTERS ONLY!!  any more will be dropped
+uint32_t pkg_count = 0;
 
 cmd_t empty_cmd = {NOT_A_COMMAND, 1, {0}};
 cmd_t *cmd = &empty_cmd;
@@ -242,7 +243,10 @@ void loop()
         case REQ_FLOAT:
             Serial.println("Going to send a float");
             //TODO: Put a float (perhaps pi) into a command response and send it.
-            amdtpsSendData((uint8_t *)res_cmd, TODO_VAL);
+            res_cmd->command_type = GIVE_FLOAT;     //set command type as GIVE_FLOAT
+            res_cmd->length=6;                      //length doesn't matter since the handler will take care of this
+            ((float *)(res_cmd->data))[0] = 1.23f;  //put a float into data to send
+            amdtpsSendData((uint8_t *)res_cmd, 6);  //2 bytes for type and length, 4 bytes of data
             break;
         case PING:
             Serial.println("Ping Pong");
@@ -253,6 +257,7 @@ void loop()
             bytestream_active = (int)cmd->data[0];
             //Serial.printf("Start bytestream with active %d \n", bytestream_active);
             ((uint32_t *)res_cmd->data)[0] = 0;
+            bytestream_active = 1;
             break;
         case STOP_BYTESTREAM_TX:
             bytestream_active = 0;
@@ -292,13 +297,43 @@ void loop()
 
     if (bytestream_active)
     {
-        res_cmd->command_type = BYTESTREAM_TX;
-        res_cmd->length = TODO_VAL;
+        res_cmd->command_type = BYTESTREAM_TX;  //set command type to bytestream transmit
+        res_cmd->length = 14;                    //length doesn't matter since the handler will take care of this
         //TODO: Put an example of a 32-bit integer and a 64-bit integer
         //for the stream. Be sure to add a corresponding case in the
         //python program.
         //Serial.printf("Stream %d \n", bytestream_active);
-        amdtpsSendData((uint8_t *)res_cmd, TODO_VAL);
+        
+        ((uint32_t *)(res_cmd->data))[0] = 32;  //put a 32 bit integer into data to send (4 bytes)
+        
+        uint64_t num = 64;
+        memcpy(res_cmd->data+4, &num, 8);       //put a 64 bit integer into data to send (8 bytes)
+      
+      
+        // send a little data
+        //amdtpsSendData((uint8_t *)res_cmd, 14);  //2 bytes for type and length, 12 bytes of data
+      
+        // send a lot of data
+        uint64_t num2 = 65;
+        memcpy(res_cmd->data+12, &num2, 8);       //put a 64 bit integer into data to send (8 bytes)
+        uint64_t num3 = 66;
+        memcpy(res_cmd->data+20, &num3, 8);       //put a 64 bit integer into data to send (8 bytes)
+        uint64_t num4 = 67;
+        memcpy(res_cmd->data+28, &num4, 8);       //put a 64 bit integer into data to send (8 bytes)
+        uint64_t num5 = 68;
+        memcpy(res_cmd->data+36, &num5, 8);       //put a 64 bit integer into data to send (8 bytes)
+        uint64_t num6 = 69;
+        memcpy(res_cmd->data+44, &num6, 6);       //put a 64 bit integer into data to send (8 bytes)     
+        uint64_t num7 = 70;
+        memcpy(res_cmd->data+52, &num7, 8);       //put a 64 bit integer into data to send (8 bytes)
+        uint64_t num8 = 70;
+        memcpy(res_cmd->data+60, &num8, 8);       //put a 64 bit integer into data to send (8 bytes)
+        amdtpsSendData((uint8_t *)res_cmd, 70);  //2 bytes for type and length, 68 bytes of data
+        
+        //Print time
+        unsigned long t = micros();
+        Serial.printf("Package %d sent at %d us \n", pkg_count, t);
+        pkg_count++;
     }
 
     trigger_timers();
