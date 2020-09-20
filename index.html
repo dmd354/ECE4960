@@ -344,7 +344,7 @@ else
 									<br>
 									<img class="img-fluid mb-5" src="Lab02/img/6.png" alt="" />
 									<br>
-									<p>It can be seen that  the largest number of pings took around 100-105ms. Of all of the data points, the average time was 101.25ms. The line <code>amdtpsSendData(m_Rcvd, l_Rcvd);</code> in the PING case shows that l_Rcvd is the length of the data being transmitted in the ping. The code was modified so that l_Rcvd would be printed in the serial monitor, and it was found to be 99. From this, it was calculated that on average the bluetooth transmission was about 15643 bits per second. This is significantly lower than the serial transmission used in this lab of 115200 baud (115200 bits/sec).</p>
+									<p>It can be seen that  the largest group of pings took around 100-105ms. The times ranged from 79.8 to 143.6ms and the average time was 101.25ms. The line <code>amdtpsSendData(m_Rcvd, l_Rcvd);</code> in the PING case shows that l_Rcvd is the length of the data being transmitted in the ping. The sketch was modified so that l_Rcvd would be printed in the serial monitor, and it was found to be 99. Therefore, the ping transfers 99 bytes. From this, it was calculated that on average the bluetooth transmission was about 15643 bits per second. This is significantly lower than the serial transmission used in this lab of 115200 baud (115200 bits/sec).</p>
 									<br>
 									<h3>Requesting a Float</h3>
 									<br>
@@ -435,7 +435,7 @@ if (code == Commands.BYTESTREAM_TX.value):
 									<img class="img-fluid mb-5" src="Lab02/img/8.png" alt="" />
 									<img class="img-fluid mb-5" src="Lab02/img/9.png" alt="" />
 									<br>
-									<p>It can be seen that the largest chunk of time was between 10.86 and 11.06ms for the smaller package, and between 11.14 and 11.34ms for the larger package. On average, the 14-byte packages were sent every 11.03ms and the 70-byte packages were sent every 11.16ms. This indicates that the larger packages sent slightly slower, but the difference is not significant. For the 14-byte test, 932 packages were sent, but the terminal only printed 811 of them indicating that about 13% of them were dropped. For the 70-byte test, 904 packages were sent, but the terminal only printed 766 of them indicating that about 15% of them were dropped.</p>
+									<p>It can be seen that the largest amount of measurements of time was between 10.86 and 11.06ms for the smaller package, and between 11.14 and 11.34ms for the larger package. On average, the 14-byte packages were sent every 11.03ms and the 70-byte packages were sent every 11.16ms. This indicates that the larger packages sent slightly slower. For the 14-byte test, 932 packages were sent, but the terminal only printed 811 of them indicating that about 13% of them were dropped. For the 70-byte test, 904 packages were sent, but the terminal only printed 766 of them indicating that about 15% of them were dropped.</p>
 									<br>
                                     <button class="btn btn-dark" data-dismiss="modal">
                                         <i class="fas fa-times fa-fw"></i>
