@@ -455,20 +455,108 @@ if (code == Commands.BYTESTREAM_TX.value):
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true"><i class="fas fa-times"></i></span>
                     </button>
-                    <div class="modal-body text-center">
+                    <div class="modal-body">
                         <div class="container">
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
                                     <!-- Lab Modal - Title-->
-                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0" id="portfolioModal3Label">Lab 03</h2>
+                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0 text-center" id="portfolioModal3Label">Lab 03</h2>
                                     <!-- Icon Divider-->
                                     <div class="divider-custom">
                                         <div class="divider-custom-line"></div>
                                     </div>
-                                    <!-- Lab Modal - Image-->
-                                    <!--<img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="" />-->
-                                    <!-- Lab Modal - Text-->
-                                    <p class="mb-5">Coming soon...</p>
+									<h3>Abstract</h3>
+									<br>
+									<p>In this lab, several observations, measurements and calculations were made for both the physical remote control car and the simulated robot</p>							
+									<br>
+									<h3>Part A: Characterizing the Car</h3>
+									<br>
+									<p><u>Dimensions</u></p>
+									<br>
+									<p>Several dimensions were measured at least four times using a pair of digital callipers. The dimensions measured can be found in the image below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab03/img/dim.png" alt="" />
+									<br>
+									<p>The averaged measurements were:</p>
+									<ul>
+										<li>Wheel Diameter: 77.4 mm</li>
+										<li>Distance Between Axle Centers: 80.0 mm</li>
+										<li>Width: 139.1 mm</li>
+										<li>Length: 145.8 mm</li>
+									</ul>
+									<p>These dimensions may be useful when coming up with a model for the platform. The most useful dimension is most likely the wheel diameter which can be used to determine distance the car will travel per revolution as well as the tangential force that torque on the wheels will cause.</p>
+									<br>
+									<p><u>Backlash</u></p>
+									<br>
+									<p>The backlash of the gear train driving the wheels was measured by marking one of the little treads on one wheel with a pencil, and holding that wheel fixed so that the marked tread is the closest to the other wheel. Then the other wheel was turned as far as possible in one direction without straining the system. Then the tread on the turned wheel closest to the already marked tread was also marked. The turned wheel was then turned the opposite direction in a similar manner. From this position, the number of treads between the turning wheels starting and final position were counted. This is diagrammed in the figure below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab03/img/bl.png" alt="" />
+									<br>
+									<p>From the knowledge that each wheel has 92 little treads, it was calculated from 4 trials that the backlash is approximately 11.7 degrees. This measurement can only be seen as approximate because of the amount of play in the system and how easily the plastic bent. Knowing that this much backlash exists in the system will be useful since it will add some mechanical delay between the motor turning and the wheels turning.</p>
+									<br>
+									<p><u>Wheel Speed</u></p>
+									<br>
+									<p>The speed of the car’s wheels was measured using a slow-motion camera. This was done by securing the car in place, putting tape on one wheel, and comparing that piece of tape’s position to the position of a  stationary piece of tape. A computer with a stopwatch was also placed in the camera’s field of view. The setup for this test can be seen below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab03/img/speed_setup.png" alt="" />
+									<br>
+									<p>Slow-motion videos were recorded of both the right and left wheels spinning forward and backwards in both “speedy” and “slowly” modes. These videos can be seen below.</p>
+									<br>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/kG6wfYmQjos" allowfullscreen></iframe>
+									</div>
+									<br>
+									<p>The speed was calculated by using the stopwatch to find the time for the wheel to fully rotate 4 times and averaging the values calculated from two sets of rotations for each case. The rotations chosen were several seconds after the start, and several seconds before the stop of the control input to ensure that the spinning was steady-state. The spinning speed was found to be about 12.9 rev/s in “Slowly” mode and 14.4 rev/s in “Speedy” mode. Although the wheels will turn slower when actually moving the car due to friction and the added load of the car’s weight, this speed can be used to approximate the max speed the car could go.</p>
+									<br>
+									<p><u>Tricks and Performance</u></p>
+									<br>
+									<p>Having the car go at full speed in one direction, and then quickly switching the direction momentarily results in the car doing a forward roll as seen in the video below.</p>
+									<br>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/jzS7eQ7KOkk" allowfullscreen></iframe>
+									</div>
+									<br>
+									<p>The car was found to turn reasonably well around its center. The video below shows the car turning in a roughly 9 inch circle of electrical tape in both “speedy” and “slowly” modes.</p>
+									<br>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/Q4GD8aLt4mY" allowfullscreen></iframe>
+									</div>
+									<br>
+									<p>It can be seen that the car can stay in the circle for at least one or two rotations. It tended to drift off to the right, but upon further inspection of the floor, it was found to be slightly inclined. This test shows that an approximation of the car turning about its axis like a unicycle-robot model could be accurate.</p>
+									<br>
+									<p><u>Summary</u></p>
+									<br>
+									<p>The values measured and calculated are tabulated below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab03/img/sum.png" alt="" />
+									<br>
+									<h3>Part B: Characterizing the Virtual Robot</h3>
+									<br>
+									<p>All of the steps were followed to install software dependencies, set up the base code, start the simulator, and start the keyboard teleoperation tool. Only one small error was encountered. This error can be found in the picture below and was corrected by simply running the command given in the error message.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab03/img/e1.png" alt="" />
+									<br>
+									<p>The teleop commands were used to move the robot around. This can be seen in the video below in which the speed is adjusted and the robot is driven around.</p>
+									<br>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/cGGPTknislU" allowfullscreen></iframe>
+									</div>
+									<br>
+									<p>The video shows the following aspects of the simulation environment:</p>
+									<ul>
+										<li>When the robot collides with a wall a warning triangle appears over the robot, and it stops moving</li>
+										<li>Teleoperation works from the perspective view</li>
+										<li>The robot could be dragged and dropped with the cursor</li>
+										<li>when the robot is placed outside of the maze area and is driven out of the workspace, the workspace extends</li>
+									</ul>
+									<p>There didn't seem to be lower limits on the speed of the robot as the values could be changed to be arbitrarily small in the terminal and the robot would just move slower and slower. However, the robot seemed to have an upper limit on the linear and angular speed as the value could be increased in the terminal, but the robot would stop accelerating at a certain point. This max speed was measured using the video below in which the input speeds were made very large and the robot was driven straight and rotated.</p>
+									<br>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/mSlhdMmfAW0" allowfullscreen></iframe>
+									</div>
+									<br>
+									<p>By looking at the robot pose and the clock at various times, the maximum linear speed was calculated to be 1 unit/sec and the maximum angular speed was calculated to be 90 deg/sec.</p>
+									<br>
                                     <button class="btn btn-dark" data-dismiss="modal">
                                         <i class="fas fa-times fa-fw"></i>
                                         Close Window
@@ -488,12 +576,12 @@ if (code == Commands.BYTESTREAM_TX.value):
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true"><i class="fas fa-times"></i></span>
                     </button>
-                    <div class="modal-body text-center">
+                    <div class="modal-body">
                         <div class="container">
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
                                     <!-- Lab Modal - Title-->
-                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0" id="portfolioModal4Label">Lab 04</h2>
+                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0 text-center" id="portfolioModal4Label">Lab 04</h2>
                                     <!-- Icon Divider-->
                                     <div class="divider-custom">
                                         <div class="divider-custom-line"></div>
@@ -521,12 +609,12 @@ if (code == Commands.BYTESTREAM_TX.value):
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true"><i class="fas fa-times"></i></span>
                     </button>
-                    <div class="modal-body text-center">
+                    <div class="modal-body">
                         <div class="container">
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
                                     <!-- Lab Modal - Title-->
-                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0" id="portfolioModal5Label">Lab 05</h2>
+                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0 text-center" id="portfolioModal5Label">Lab 05</h2>
                                     <!-- Icon Divider-->
                                     <div class="divider-custom">
                                         <div class="divider-custom-line"></div>
@@ -554,12 +642,12 @@ if (code == Commands.BYTESTREAM_TX.value):
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true"><i class="fas fa-times"></i></span>
                     </button>
-                    <div class="modal-body text-center">
+                    <div class="modal-body">
                         <div class="container">
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
                                     <!-- Lab Modal - Title-->
-                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0" id="portfolioModal6Label">Lab 06</h2>
+                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0 text-center" id="portfolioModal6Label">Lab 06</h2>
                                     <!-- Icon Divider-->
                                     <div class="divider-custom">
                                         <div class="divider-custom-line"></div>
@@ -587,12 +675,12 @@ if (code == Commands.BYTESTREAM_TX.value):
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true"><i class="fas fa-times"></i></span>
                     </button>
-                    <div class="modal-body text-center">
+                    <div class="modal-body">
                         <div class="container">
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
                                     <!-- Lab Modal - Title-->
-                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0" id="portfolioModal7Label">Lab 07</h2>
+                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0 text-center" id="portfolioModal7Label">Lab 07</h2>
                                     <!-- Icon Divider-->
                                     <div class="divider-custom">
                                         <div class="divider-custom-line"></div>
@@ -620,12 +708,12 @@ if (code == Commands.BYTESTREAM_TX.value):
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true"><i class="fas fa-times"></i></span>
                     </button>
-                    <div class="modal-body text-center">
+                    <div class="modal-body">
                         <div class="container">
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
                                     <!-- Lab Modal - Title-->
-                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0" id="portfolioModal8Label">Lab 08</h2>
+                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0text-center" id="portfolioModal8Label">Lab 08</h2>
                                     <!-- Icon Divider-->
                                     <div class="divider-custom">
                                         <div class="divider-custom-line"></div>
@@ -653,12 +741,12 @@ if (code == Commands.BYTESTREAM_TX.value):
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true"><i class="fas fa-times"></i></span>
                     </button>
-                    <div class="modal-body text-center">
+                    <div class="modal-body">
                         <div class="container">
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
                                     <!-- Lab Modal - Title-->
-                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0" id="portfolioModal9Label">Lab 09</h2>
+                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0 text-center" id="portfolioModal9Label">Lab 09</h2>
                                     <!-- Icon Divider-->
                                     <div class="divider-custom">
                                         <div class="divider-custom-line"></div>
@@ -686,12 +774,12 @@ if (code == Commands.BYTESTREAM_TX.value):
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true"><i class="fas fa-times"></i></span>
                     </button>
-                    <div class="modal-body text-center">
+                    <div class="modal-body">
                         <div class="container">
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
                                     <!-- Lab Modal - Title-->
-                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0" id="portfolioModal10Label">Lab 10</h2>
+                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0 text-center" id="portfolioModal10Label">Lab 10</h2>
                                     <!-- Icon Divider-->
                                     <div class="divider-custom">
                                         <div class="divider-custom-line"></div>
@@ -719,12 +807,12 @@ if (code == Commands.BYTESTREAM_TX.value):
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true"><i class="fas fa-times"></i></span>
                     </button>
-                    <div class="modal-body text-center">
+                    <div class="modal-body">
                         <div class="container">
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
                                     <!-- Lab Modal - Title-->
-                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0" id="portfolioModal11Label">Lab 11</h2>
+                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0 text-center" id="portfolioModal11Label">Lab 11</h2>
                                     <!-- Icon Divider-->
                                     <div class="divider-custom">
                                         <div class="divider-custom-line"></div>
@@ -752,12 +840,12 @@ if (code == Commands.BYTESTREAM_TX.value):
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true"><i class="fas fa-times"></i></span>
                     </button>
-                    <div class="modal-body text-center">
+                    <div class="modal-body">
                         <div class="container">
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
                                     <!-- Lab Modal - Title-->
-                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0" id="portfolioModal12Label">Lab 12</h2>
+                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0 text-center" id="portfolioModal12Label">Lab 12</h2>
                                     <!-- Icon Divider-->
                                     <div class="divider-custom">
                                         <div class="divider-custom-line"></div>
