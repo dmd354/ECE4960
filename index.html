@@ -586,10 +586,176 @@ if (code == Commands.BYTESTREAM_TX.value):
                                     <div class="divider-custom">
                                         <div class="divider-custom-line"></div>
                                     </div>
-                                    <!-- Lab Modal - Image-->
-                                    <!--<img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="" />-->
-                                    <!-- Lab Modal - Text-->
-                                    <p class="mb-5">Coming soon...</p>
+									<h3>Abstract</h3>
+                                    <br>
+									<p>In this lab, the Artemis board was connected to the motors of the car through the motor driver and open loop control was implemented. Open loop control was also explored in the simulation environment.</p>
+									<br>
+									<h3>Part A: Hardware Open Loop Control</h3>
+									<br>
+									<p>The artemis board was connected to the motor driver, and “Example1_wire” was run to find the address of the driver. The address was found to be 0x5D which matches the the default address shown on <a href="https://learn.sparkfun.com/tutorials/hookup-guide-for-the-qwiic-motor-driver?_ga=2.14725942.1279742571.1601299911-1939484602.1599657570#software-setup">Sparkfun’s website</a>.</p>
+									<br>
+									<p>Taking apart the car involved four sets of screws. The locations of these screws is diagrammed below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab04/img/screw.png" alt="" />
+									<br>
+									<p>Instead of cutting the power cables from the control PCB like some kind of barbarian, I desoldered them.</p>
+									<p>To route the Qwiic connector cable from inside the car to the artemis board, the hole where the power button was actuated through was drilled out to a 5/16th inch hole. This hole can be seen below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab04/img/hole.png" alt="" />
+									<br>
+									<p>The motor driver was connected to the motors and battery and its placement inside the car can be seen below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab04/img/inside.png" alt="" />
+									<br>
+									<p>The gray cover for the button piece was cut in half and put over the drilled hole to keep a classy look. The Artemis Board and its battery were then taped to the outside of the car to keep them temporarily secured, but still easily accessible. The assembled car can be seen below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab04/img/assembled_car.png" alt="" />
+									<br>
+									<p>The examples\MotorTest code was modified for use in this lab. The I2C address in the code was changed to match that of the motor driver.</p>
+									<p>The minimum value for which the motors would turn was found by using the code below and seeing on the serial window at what input the wheels started to turn.</p>
+									<br>
+									<pre><code>
+//set motor constants
+#define L_MOTOR 0
+#define R_MOTOR 1
+#define FWD 0
+#define REV 1
+void loop()
+{
+  //***** Operate the Motor Driver *****//
+  //  It uses .setDrive( motorName, direction, level ) to drive the motors.
+
+  for (int i = 50; i < 70; i++)
+  {
+    Serial.printf("Right Side, current input: %d\n", i);
+    myMotorDriver.setDrive( R_MOTOR, FWD, i);
+    delay(1000);
+  }
+  myMotorDriver.setDrive( R_MOTOR, FWD, 0);
+  
+  for (int i = 50; i < 70; i++)
+  {
+    Serial.printf("Left Side, current input: %d\n", i);
+    myMotorDriver.setDrive( L_MOTOR, FWD, i);
+    delay(1000);
+  }
+  myMotorDriver.setDrive( L_MOTOR, FWD, 0);
+}
+									</code></pre>
+									<br>
+									<p>The wheels were found to turn  at rather inconsistent values, but by averaging several values, the wheels were found to turn around an input of 59 (σ=1.2) for the left side, and 54 (σ=2.0) for the right side. This of course is dependent on how fresh the battery is, and with a slightly used battery the values were found to be 64 (σ=4.0) and 59 (σ=1.2). It was also found that both wheels would turn at much lower inputs if given a little nudge. The important takeaway here is that inputs below 70 should probably be avoided unless the wheels are already turning in that direction.</p>
+									<p>The following lines were found on the <a href="https://learn.sparkfun.com/tutorials/hookup-guide-for-the-qwiic-motor-driver?_ga=2.14725942.1279742571.1601299911-1939484602.1599657570#software-setup">Sparkfun page</a> and added to the setup code so that the motors would have the same forward direction.</p>
+									<br>
+									<pre><code>
+// motor 1 inversion so that forward is the same for both motors
+while ( myMotorDriver.busy() ); //Waits until the SCMD is available.
+myMotorDriver.inversionMode(1, 1); //invert motor 1
+
+									</code></pre>
+									<br>
+									<p>Then the code below was written to test how straight the car drives.</p>
+									<br>
+									<pre><code>
+//set motor constants
+#define L_MOTOR 0
+#define R_MOTOR 1
+#define FWD 0
+#define REV 1
+void loop()
+{
+  //***** Operate the Motor Driver *****//
+  //  It uses .setDrive( motorName, direction, level ) to drive the motors.
+
+  //Set both motors going forward at a medium speed for some time
+  myMotorDriver.setDrive( L_MOTOR, FWD, 100);
+  myMotorDriver.setDrive( R_MOTOR, FWD, 100);
+  delay(2400);
+  //Turn off both motors
+  myMotorDriver.setDrive( L_MOTOR, FWD, 0);
+  myMotorDriver.setDrive( R_MOTOR, FWD, 0);
+
+  while(1); //stop after one run
+}
+									</code></pre>
+									<br>
+									<p>The following video shows the above code running when the car is placed on a straight piece of tape that has perpendicular pieces of tape that indicate 6 feet.</p>
+									<br>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/P11lz3kDZ8M" allowfullscreen></iframe>
+									</div>
+									<br>
+									<p>It can be seen that at the end of 6 feet, the car is consistently still partially overlapping with the tape. This shows that the car can go pretty straight without a calibration factor.</p>
+									<p>The code below was then written to demonstrate open loop control.</p>
+									<br>
+									<pre><code>
+  for (int i = 0; i < 4; i++) //run through these commands 4 times
+  {
+    //drive forward for a bit
+    myMotorDriver.setDrive( L_MOTOR, FWD, 80);
+    myMotorDriver.setDrive( R_MOTOR, FWD, 80);
+    delay(1000);
+    
+    //Turn Right for a bit
+    myMotorDriver.setDrive( L_MOTOR, FWD, 200);
+    myMotorDriver.setDrive( R_MOTOR, REV, 200);
+    delay(1500);
+  
+    //drive backward for a bit
+    myMotorDriver.setDrive( L_MOTOR, REV, 100);
+    myMotorDriver.setDrive( R_MOTOR, REV, 100); 
+    delay(800);
+
+    //Turn Left for a bit
+    myMotorDriver.setDrive( L_MOTOR, REV, 200);
+    myMotorDriver.setDrive( R_MOTOR, FWD, 200);
+    delay(1000);
+  }
+  
+  // stop motors
+  myMotorDriver.setDrive( L_MOTOR, REV, 0);
+  myMotorDriver.setDrive( R_MOTOR, REV, 0); 
+
+  while(1); //stop
+									</code></pre>
+									<br>
+									<p>The code includes commands to drive and turn in all directions at various speeds for various times. The code running on the robot can be seen in the video below.</p>
+									<br>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/4aPx2wvLV3Y" allowfullscreen></iframe>
+									</div>
+									<br>
+									<h3>Part B: Simulation Open-Loop Control</h3>
+									<br>
+									<p>Before starting this part, the VM hard disk space was expanded to 16 GB, and the provided Jupyter Lab tutorial was followed.</p>
+									<p>The base code was set up, and the Jupyter Lab Notebook was started. By running all of the code blocks in the notebook and playing around with the code in the Move the Robot section, the basic function of the Robot class was understood.</p>
+									<p>The following code was written to have the robot follow a roughly rectangular loop.</p>
+									<br>
+									<pre><code>
+steps = 12 # number of steps to take (3 times around the square)
+step = 0 # current step
+while step < steps:
+
+    #rotate at 90deg/sec for 1 second
+    robot.set_vel(0,1.5708) # rotate 
+    time.sleep(1)
+
+    #go foward for a bit
+    robot.set_vel(.5,0) 
+    time.sleep(2)
+    
+#stop robot
+robot.set_vel(0,0)
+									</code></pre>
+									<br>
+									<p>The code works by having the robot turn at 90 deg/sec for 1 second to turn a right angle, and then going forward for two seconds. By looping these two commands, a square path was created. This operation assumes that the angular velocity control is the exact speed that the robot moves. This wouldn’t work as well on a physical system, since the angular velocity couldn’t be controlled with such accuracy.</p>
+									<p>The operation of the code can be seen in the video below.</p>
+									<br>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/Hbhm3FdBvPc" allowfullscreen></iframe>
+									</div>
+									<br>
+									<p>Footprints were turned on so that the path would be more clear. It can be seen that the robot follows a very square path. </p>
+									<br>
                                     <button class="btn btn-dark" data-dismiss="modal">
                                         <i class="fas fa-times fa-fw"></i>
                                         Close Window
