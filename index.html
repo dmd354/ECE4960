@@ -625,7 +625,7 @@ void loop()
   //***** Operate the Motor Driver *****//
   //  It uses .setDrive( motorName, direction, level ) to drive the motors.
 
-  for (int i = 50; i < 70; i++)
+  for (int i = 50; i &lt; 70; i++)
   {
     Serial.printf("Right Side, current input: %d\n", i);
     myMotorDriver.setDrive( R_MOTOR, FWD, i);
@@ -633,7 +633,7 @@ void loop()
   }
   myMotorDriver.setDrive( R_MOTOR, FWD, 0);
   
-  for (int i = 50; i < 70; i++)
+  for (int i = 50; i &lt; 70; i++)
   {
     Serial.printf("Left Side, current input: %d\n", i);
     myMotorDriver.setDrive( L_MOTOR, FWD, i);
@@ -688,7 +688,7 @@ void loop()
 									<p>The code below was then written to demonstrate open loop control.</p>
 									<br>
 									<pre><code>
-  for (int i = 0; i < 4; i++) //run through these commands 4 times
+  for (int i = 0; i &lt; 4; i++) //run through these commands 4 times
   {
     //drive forward for a bit
     myMotorDriver.setDrive( L_MOTOR, FWD, 80);
@@ -733,7 +733,7 @@ void loop()
 									<pre><code>
 steps = 12 # number of steps to take (3 times around the square)
 step = 0 # current step
-while step < steps:
+while step &lt; steps:
 
     #rotate at 90deg/sec for 1 second
     robot.set_vel(0,1.5708) # rotate 
@@ -798,7 +798,6 @@ robot.set_vel(0,0)
 									</ul>
                                     <p>The proximity sensor has a range of 0-200mm with no dead zone and SparkFun claims that this sensor is better for detecting qualitative detection than distance measurements. The ToF sensor has a range of 40-400mm. Because of this, I plan on mounting both sensors on the front of the car and using the proximity sensor for distance measurements less than 4cm from the car, and the ToF sensor for all other distance measurements.</p>
                                     <p>Because of this proposed setup, the robot will be unable to detect any objects not directly in front of it.</p>
-									<br>
                                     <p>The following table discusses several distance sensors based on infrared transmission. This information in this table was found in the <a href="https://cei-lab.github.io/ECE4960/lectures/FastRobots-3-Sensors.pdf">Lecture 3 Slides</a>.</p>
 									<br>
                                     <img class="img-fluid mb-5" src="Lab05/img/ir_table.png" alt="" />
@@ -830,13 +829,12 @@ unsigned long delt = micros() - t0;
 Serial.println(delt);
 									</code></pre>
 									<br>
-                                    <p>It was found that it takes about 0.630 ms to read the sensor value.</p>
+                                    <p>It was found that it takes about 630 μs (σ=0.76) to read the sensor value.</p>
 									<br>
                                     <p><u>Time of Flight Sensor</u></p>
 									<br>
-                                    <p>By running Example1_wire the I2C address of the ToF sensor was found to be 0x29. This does not match the default specified on the datasheet.</p>
+                                    <p>By running Example1_wire the I2C address of the ToF sensor was found to be 0x29. This does not match the default specified on the datasheet, but the datasheet does specify that the address is programmable so it can be changed.</p>
                                     <p>The ToF sensor was found to need calibration, so Example7_Calibration was run. It was found that this code didn’t work as provided. <code>startRanging()</code> and <code>stopRanging()</code> commands had to be added to the code that looks for a low distance to initialize the calibration. Once this was done, the calibration code worked.</p>
-									<br>
                                     <p>Since the robot has a maximum speed around 2.7m/s as found in Lab 3, taking a distance reading every 55 ms would result in the robot having 15cm of space to react after seeing something. Because of the ToF sensor’s large range, this seemed like a reasonable range, so the timing budget was set to 50, and the inter measurement period was set to 5 with the following lines put into the setup code.</p>
 									<br>
 									<pre><code>
@@ -866,7 +864,7 @@ void setup(void)
 
   Serial.begin(115200);
   Serial.println("VL53L1X Qwiic Test");
-  //VL53L1_SetInterMeasurementPeriodMilliSeconds(&VL53L1Dev, 1000 );
+  //VL53L1_SetInterMeasurementPeriodMilliSeconds(&amp;VL53L1Dev, 1000 );
   if (distanceSensor.begin() != 0) //Begin returns 0 on a good init
   {
     Serial.println("Sensor failed to begin. Please check wiring. Freezing...");
@@ -931,16 +929,16 @@ void loop(void)
                                     <p>The following code was written to test how fast the robot could go and still stop before hitting an obstacle.</p>
 									<br>
 									<pre><code>
-#include <Arduino.h>
-#include <stdint.h>
+#include &lt;Arduino.h&gt;
+#include &lt;stdint.h&gt;
 #include "SCMD.h"
 #include "SCMD_config.h" //Contains #defines for common SCMD register names and values
-#include <ComponentObject.h>
-#include <RangeSensor.h>
-#include <SparkFun_VL53L1X.h>
-#include <vl53l1x_class.h>
-#include <vl53l1_error_codes.h>
-#include <Wire.h>
+#include &lt;ComponentObject.h&gt;
+#include &lt;RangeSensor.h&gt;
+#include &lt;SparkFun_VL53L1X.h&gt;
+#include &lt;vl53l1x_class.h&gt;
+#include &lt;vl53l1_error_codes.h&gt;
+#include &lt;Wire.h&gt;
 #include "SparkFun_VL53L1X.h" //Click here to get the library: http://librarymanager/All#SparkFun_VL53L1X
 
 //Optional interrupt and shutdown pins.
@@ -980,7 +978,7 @@ void setup(void)
   Wire.begin();
 
   Serial.println("VL53L1X Qwiic Test");
-  //VL53L1_SetInterMeasurementPeriodMilliSeconds(&VL53L1Dev, 1000 );
+  //VL53L1_SetInterMeasurementPeriodMilliSeconds(&amp;VL53L1Dev, 1000 );
   if (distanceSensor.begin() != 0) //Begin returns 0 on a good init
   {
     Serial.println("Sensor failed to begin. Please check wiring. Freezing...");
@@ -1015,7 +1013,7 @@ void loop(void)
   byte rangeStatus = distanceSensor.getRangeStatus();
   if(rangeStatus==0)  //only act if sensor reading was good
   {
-    if(distance==0 || distance>300) //0 if there is no object nearby
+    if(distance==0 || distance&gt;300) //0 if there is no object nearby
     {
       //drive straight
       myMotorDriver.setDrive( L_MOTOR, FWD, 125);
@@ -1092,11 +1090,16 @@ void loop(void)
 									</div>
 									<br>
 									<p>The robot does a pretty good job at detecting and avoiding large objects, but when there are narrower objects or objects that aren’t directly in front of it, it doesn't detect them, and sometimes runs into them.</p>
-									<br>
 									<p>In an attempt to get the robot to detect narrower obstacles, the proximity sensor reading was added to the object detection code as follows. </p>
 									<br>
 									<pre><code>
-int distance = distanceSensor.getDistance(); //Get the result of the measurement from ToF sensor
+void loop(void)
+{
+  while (!distanceSensor.checkForDataReady())
+  {
+    delay(1);
+  }
+  int distance = distanceSensor.getDistance(); //Get the result of the measurement from ToF sensor
   unsigned int proxValue = proximitySensor.getProximity();  //Get result from prox sensor
   distanceSensor.clearInterrupt();
 
@@ -1111,7 +1114,7 @@ int distance = distanceSensor.getDistance(); //Get the result of the measurement
   byte rangeStatus = distanceSensor.getRangeStatus();
   if(rangeStatus==0)  //only act if sensor reading was good
   {
-    if((distance==0 || distance>300) && proxValue<20) //0 if there is no object nearby
+    if((distance==0 || distance&gt;300) &amp;&amp; proxValue&lt;20) //0 if there is no object nearby
     {
       myMotorDriver.setDrive( L_MOTOR, FWD, 120);
       myMotorDriver.setDrive( R_MOTOR, FWD, 120);
@@ -1131,7 +1134,7 @@ int distance = distanceSensor.getDistance(); //Get the result of the measurement
   }
 									</code></pre>
 									<br>
-									<p>Appropriate setup for the proximity sensor was also added to the code. Unfortunately, this addition did not make a dramatic difference on the robot's obstacle avoidance, and its operation can be seen as roughly as slightly improved from before in the following video.</p>
+									<p>Appropriate setup for the proximity sensor was also added to the code. This addition did not make a dramatic difference on the robot's obstacle avoidance, and its operation can be seen as slightly improved from before in the following video.</p>
 									<br>
 									<div class="embed-responsive embed-responsive-16by9">
 										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/WzgIKMxdG5U" allowfullscreen></iframe>
