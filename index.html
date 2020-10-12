@@ -1205,10 +1205,190 @@ perform_obstacle_avoidance(robot)
                                     <div class="divider-custom">
                                         <div class="divider-custom-line"></div>
                                     </div>
-                                    <!-- Lab Modal - Image-->
-                                    <!--<img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="" />-->
-                                    <!-- Lab Modal - Text-->
-                                    <p class="mb-5">Coming soon...</p>
+                                    <h3>Abstract</h3>
+									<br>
+									<p></p>
+									<br>
+									<h3>Part A: IMU, PID, and Odometry</h3>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<p></p>
+									<br>
+									<h3>Part B: Odometry and Ground Truth in the Virtual Robot</h3>
+									<br>
+									<p>The following code was written to test the <code>.get_pose()</code> and <code>.get_gt_pose()</code> functions.</p>
+									<br>
+									<code><pre>
+# Use this data cell to test the member functions
+od_pose = robot.get_pose()
+gt_pose = robot.get_gt_pose()
+print('Odometer pose = ({:.3f}, {:.3f}, {:.3f})\n'.format(od_pose[0], od_pose[1], od_pose[2]))
+print('Ground truth pose = ({:.3f}, {:.3f}, {:.3f})\n'.format(gt_pose[0], gt_pose[1], gt_pose[2]))
+									</code></pre>
+									<br>
+									<p>The code below was used to plot trajectories based on odometry and ground truth.</p>
+									<br>
+									<code><pre>
+def update_plot(robot):
+    # read odometer and plot
+    od_pose = robot.get_pose() 
+    robot.send_to_plot(od_pose[0], od_pose[1], ODOM)
+    
+    # read ground truth and plot
+    gt_pose = robot.get_gt_pose()
+    robot.send_to_plot(gt_pose[0], gt_pose[1], GT)
+
+while 1: # infinite loop
+    update_plot(robot)
+    time.sleep(.5)# delay
+									</code></pre>
+									<br>
+									<p>Data was sent to the plotter every 0.5 seconds. This resulted in a reasonable amount of data being plotted so that the trajectory of the robot would be obvious, but not too many points would be plotted.</p>
+									<p>Plotting while the robot is driven around can be seen in the following video</p>
+									<br>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/xkcqVJylMWs" allowfullscreen></iframe>
+									</div>
+									<br>
+									<p>The video shows that the odometry position is roughly similar to the ground truth position, but there is significant offset as well as significant noise and drift in the odometry position.</p>
+									<br>
+									<p>By having the robot follow a circular path for about three minutes, the following plot was obtained.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab06/img/circle3min.png" alt="" />
+									<br>
+									<p>The ground truth points show a perfect circular pattern, but the odometer shows a noisy cloud of points.</p>
+									<p>When the robot was left stationary for some time the following plot was obtained.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab06/img/stationary.png" alt="" />
+									<br>
+									<p>The ground truth point remains still, but the odometry position drifts and moves about significantly.</p>
+									<p>The robot was driven in a straight line at three different speeds to obtain the following results.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab06/img/varyspeed.png" alt="" />
+									<br>
+									<p>It can be seen that a higher speed results in a straighter line from the odometry reading. This is probably because the reading has less time to drift.</p>
+									<br>
                                     <button class="btn btn-dark" data-dismiss="modal">
                                         <i class="fas fa-times fa-fw"></i>
                                         Close Window
