@@ -1211,97 +1211,311 @@ perform_obstacle_avoidance(robot)
 									<br>
 									<h3>Part A: IMU, PID, and Odometry</h3>
 									<br>
-									<p></p>
+									<p><u>Setting up the IMU</u></p>
 									<br>
-									<p></p>
+									<p>By running Example1_wire the I2C address of the proximity sensor was found to be 0x69. This matches what is specified on<a href="https://www.sparkfun.com/products/15335">Sparkfun’s website</a>.</p>
+									<p>The Example1_Basics code was run to observe the change in sensor values. When still, the acceleration was found to return about 1000mg for whichever axis was vertical, and around 0mg for the other two axes. When moving back and forth, the accelerometer values would change. When rotating the gyroscope values would change from the nearly zero values that they rest when not moving.</p>
 									<br>
-									<p></p>
+									<p><u>Accelerometer</u></p>
 									<br>
-									<p></p>
+									<p>The main loop of Example1_Basics was changed to the following to print the pitch and roll values calculated from the accelerometer. <code>math.h</code> was included, and global variables were defined for pitch and roll.</p>
 									<br>
-									<p></p>
+									<pre><code>
+void loop() {
+  
+  if( myICM.dataReady() ){
+    myICM.getAGMT();                // The values are only updated when you call 'getAGMT'
+    pitch_a = atan2(myICM.accX(),myICM.accZ())*180/M_PI;
+    Serial.print("\nPitch = ");
+    printFormattedFloat( pitch_a, 3, 2 ); 
+    roll_a = atan2(myICM.accY(),myICM.accZ())*180/M_PI;
+    Serial.print(",\tRoll = ");
+    printFormattedFloat( roll_a, 3, 2 );   
+    delay(30);
+  }
+  else{
+    Serial.println("Waiting for data");
+    delay(500);
+  }
+}
+									</code></pre>
 									<br>
-									<p></p>
+									<p>The table below shows the accelerometer positioning and sample readings for rolls and pitches of -90°, 0°, and 90°.</p>
 									<br>
-									<p></p>
+									<img class="img-fluid mb-5" src="Lab06/img/table.png" alt="" / />
 									<br>
-									<p></p>
+									<p>It can be seen that the measured values were always within 6° of the expected values of ±90° and within 2° of the expected values of 0°. This shows that the readings are fairly accurate, and should be good enough for use without calibration (especially with the uncertainty associated with the levelness of my desk).</p>
+									<p>To collect data from the sensor being tapped the following code was written to print the x acceleration.</p>
 									<br>
-									<p></p>
+									<pre><code>
+void loop() {
+  unsigned long t0 = micros(); // start time
+  if( myICM.dataReady() ){    
+    myICM.getAGMT();                // The values are only updated when you call 'getAGMT'
+    printFormattedFloat( myICM.accX(), 5, 3 );
+    Serial.print(",");
+    unsigned long delt = micros() - t0;    
+    printFormattedFloat( delt, 5, 2 );  // print time between measurements to approximate sampling frequency
+    Serial.print("\n");
+  }
+  else{
+    Serial.println("Waiting for data");
+    delay(500);
+  }
+}
+									</code></pre>
 									<br>
-									<p></p>
+									<p>Since I don’t currently have a python IDE installed on my computer, I used MATLAB to plot the frequency response of the accelerometer being tapped several times. The MATLAB code is copied below, and the frequency response plot is below that.</p>
 									<br>
-									<p></p>
+									<pre><code>
+data = table2array(readtable('tap_data.csv'));
+Ts = mean(data(:,2))*(10^-6); % average sampling time in seconds
+Fs = 1/Ts;  % sampling frequency
+
+X = data(:,1);  % accelerometer data
+
+% plot(X)         % check raw data
+% X = X(1:end);   %trim data
+
+L = length(X);  % Length of data
+Y = fft(X); % compute Fourier Transform
+
+% Compute the two-sided spectrum P2. Then compute the single-sided spectrum P1 based on P2 and the even-valued signal length L.
+P2 = abs(Y/L);
+P1 = P2(1:L/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+
+f = Fs*(0:(L/2))/L; % frequency vector
+plot(f,P1) 
+title('Single-Sided Amplitude Spectrum of X(t)')
+xlabel('f (Hz)')
+ylabel('|P1(f)|')
+									</code></pre>
 									<br>
-									<p></p>
+									<img class="img-fluid mb-5" src="Lab06/img/freq_resp.png" alt="" / />
 									<br>
-									<p></p>
+									<p>Although the plot is very noisy, several of the highest peaks are seen to occur at frequencies higher than 190Hz. Using a low-pass filter with a frequency around here should eliminate some of the sensor noise. For the LPF, ⍺ was calculated to be around 0.9 from the equations given in class. The LPF was implemented with the following code.</p>
 									<br>
-									<p></p>
+									<pre><code>
+if( myICM.dataReady() ){
+  myICM.getAGMT();                // The values are only updated when you call 'getAGMT'
+  pitch_a = atan2(myICM.accX(),myICM.accZ())*180/M_PI;
+  Serial.print("\n");
+  Serial.print(pitch_a);
+  Serial.print("\t");
+  pitch_a_LPF = alpha*pitch_a+(1-alpha)*old_pitch_a;
+  old_pitch_a = pitch_a_LPF;
+  Serial.print(pitch_a_LPF);
+  Serial.print("\t");
+  
+  roll_a = atan2(myICM.accY(),myICM.accZ())*180/M_PI;
+  Serial.print(roll_a);
+  Serial.print("\t");
+  roll_a_LPF = alpha*roll_a+(1-alpha)*old_roll_a;
+  old_roll_a = roll_a_LPF;
+  Serial.print(roll_a_LPF);
+  Serial.print("\t");
+    
+    delay(30);
+    
+}
+
+									</code></pre>
 									<br>
-									<p></p>
+									<p>The alpha value of 0.9 was found to not really reduce the noise in the signal, so the value was lowered to 0.3 which did a much better job of making the signal smooth. However, this also made the measurement lag a little more. Some sample data from the serial plotter can be found below. The filtered readings (red and yellow) are significantly less noisy.</p>
 									<br>
-									<p></p>
+									<img class="img-fluid mb-5" src="Lab06/img/LPF_serial.png" alt="" / />
 									<br>
-									<p></p>
+									<p><u>Gyroscope<u/></p>
 									<br>
-									<p></p>
+									<p>Code was added to calculate roll, pitch and yaw with the gyroscope:</p>
 									<br>
-									<p></p>
+									<pre><code>
+if( myICM.dataReady() )
+{
+    t0 = micros();
+    myICM.getAGMT();                // The values are only updated when you call 'getAGMT'
+    
+    Serial.print("\n");
+    
+    //---------------------roll---------------------
+    roll_a = -atan2(myICM.accY(),myICM.accZ())*180/M_PI;//flip sign to be consistent with gyro data
+    Serial.print(roll_a);
+    Serial.print("\t");
+    roll_a_LPF = alpha*roll_a+(1-alpha)*old_roll_a;
+    old_roll_a = roll_a_LPF;
+    Serial.print(roll_a_LPF);
+    Serial.print("\t");
+    roll_g = roll_g-myICM.gyrX()*(float)dt/1000000;  
+    Serial.print(roll_g);
+    Serial.print("\t");
+    //---------------------pitch---------------------
+    pitch_a = atan2(myICM.accX(),myICM.accZ())*180/M_PI;
+    Serial.print(pitch_a);
+    Serial.print("\t");
+    pitch_a_LPF = alpha*pitch_a+(1-alpha)*old_pitch_a;
+    old_pitch_a = pitch_a_LPF;
+    Serial.print(pitch_a_LPF);
+    Serial.print("\t");
+    pitch_g = pitch_g-myICM.gyrY()*(float)dt/1000000;
+    Serial.print(pitch_g);
+    Serial.print("\t");
+    //---------------------yaw---------------------
+    yaw_g = yaw_g-myICM.gyrZ()*(float)dt/1000000;
+    Serial.print(yaw_g); 
+    */
+    delay(30);
+    dt = (micros()-t0); //step size in microseconds
+}
+									</code></pre>
 									<br>
-									<p></p>
+									<p>The plots below show a comparison between the accelerometer pitch reading (blue), the filtered accelerometer pitch reading (red), and the gyroscope reading (green). The plot on the left shows the results when the sensor isn't moved and the plot on the right shows the results when the sensor is rotated.</p>
 									<br>
-									<p></p>
+									<img class="img-fluid mb-5" src="Lab06/img/pitch.png" alt="" / />
 									<br>
-									<p></p>
+									<p>The gyroscope gives a much less noisy reading, but drifts significantly. Similar results were obtained for roll:</p>
 									<br>
-									<p></p>
+									<img class="img-fluid mb-5" src="Lab06/img/roll.png" alt="" / />
 									<br>
-									<p></p>
+									<p>Changing the sampling frequency did not seem to have a significant effect on the measured values. I would attribute this to the way I calculate the step size in my code based on whatever step size actually occurs. </p>
+									<p>A complimentary filter was implemented to fuse the two sensor readings:</p>
 									<br>
-									<p></p>
+									<code><pre>
+if( myICM.dataReady() ){
+	t0 = micros();
+	myICM.getAGMT();                // The values are only updated when you call 'getAGMT'
+
+	Serial.print("\n");
+	//---------------------roll---------------------
+	roll_a = -atan2(myICM.accY(),myICM.accZ())*180/M_PI;//flip sign to be consistent with gyro data
+	roll_a_LPF = 0.2*roll_a+(1-0.2)*old_roll_a;
+	old_roll_a = roll_a_LPF;
+	roll_g = roll_g-myICM.gyrX()*(float)dt/1000000;
+	roll = (old_roll+roll_g*dt/1000000)*(1-alpha)+roll_a_LPF*alpha;
+	old_roll = roll;
+	Serial.print(roll);
+	Serial.print("\t");
+
+	//---------------------pitch---------------------
+	pitch_a = atan2(myICM.accX(),myICM.accZ())*180/M_PI;
+	pitch_a_LPF = 0.2*pitch_a+(1-0.2)*old_pitch_a;
+	old_pitch_a = pitch_a_LPF;
+	pitch_g = pitch_g-myICM.gyrY()*(float)dt/1000000;
+	pitch = (old_pitch+pitch_g*dt/1000000)*(1-alpha)+pitch_a_LPF*alpha;
+	old_pitch = pitch;
+	Serial.print(pitch);
+	Serial.print("\t");
+
+	//---------------------yaw---------------------
+	yaw_g = yaw_g-myICM.gyrZ()*(float)dt/1000000;
+	//Serial.print(yaw_g); 
+
+	delay(30);
+	dt = (micros()-t0); //step size in microseconds
+}
+									</code></pre>
 									<br>
-									<p></p>
+									<p>It was found that by pre-filtering the accelerometer with an alpha value of 0.2, and then using the complimentary filter a signal with minimal noise and drift was obtained. This signal can be seen in the video below which shows the serial plot with the sensor being moved around tapped, and then left still.</p>
 									<br>
-									<p></p>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/XkI8FWk9KR4" allowfullscreen></iframe>
+									</div>
 									<br>
-									<p></p>
+									<p><u>Magnetometer</u></p>
 									<br>
-									<p></p>
+									<p>The following lines were adapted from the lab instructions to calculate yaw from the magnetometer.</p>
 									<br>
-									<p></p>
+									<pre><code>
+xm = myICM.magX()*cos(pitch*M_PI/180)-myICM.magY()*sin(roll*M_PI/180)*sin(pitch)+myICM.magZ()*cos(roll*M_PI/180)*sin(pitch*M_PI/180); //these were saying theta=pitch and roll=phi
+ym = myICM.magY()*cos(roll*M_PI/180) + myICM.magZ()*sin(roll*M_PI/180);
+yaw = atan2(ym, xm)*180/M_PI;
+Serial.print(yaw);
+Serial.print("\t");
+									</code></pre>
 									<br>
-									<p></p>
+									<p>The sensor was rotated until the reading was around 0° to find North. The sensor orientation when facing north can be seen below. In the picture my keyboard is approximately parallel with the wall of my apartment.</p>
 									<br>
-									<p></p>
+									<img class="img-fluid mb-5" src="Lab06/img/north.png" alt="" / />
 									<br>
-									<p></p>
+									<p>The yaw value was found to be somewhat robust against small changes in roll and pitch especially if those small angle changes were along the axis perpendicular to the North-South direction.</p>
 									<br>
-									<p></p>
+									<p><u>PID Control</u></p>
 									<br>
-									<p></p>
+									<p>Code from Labs 2, 5, and 6 were combined to enable all of the sensors, bluetooth, and the motors. The handler in main.py was modified to take the data that I wanted to observe:</p>
 									<br>
-									<p></p>
+									<pre><code>
+if (code == Commands.BYTESTREAM_TX.value):
+    print(unpack("&lt;LBBff", data))   #unpacks 1 long, 2 chars and 2 floats
+									</code></pre>
 									<br>
-									<p></p>
+									<p>The following code was implemented in the arduino sketch to send the current time, motor values, z-axis gyroscope reading, and yaw value to my PC via Bluetooth.</p>
 									<br>
-									<p></p>
+									<pre><code>
+if (bytestream_active)
+{
+	res_cmd->command_type = BYTESTREAM_TX;  //set command type to bytestream transmit
+	res_cmd->length = 14;                    //length doesn't matter since the handler will take care of this
+	//TODO: Put an example of a 32-bit integer and a 64-bit integer
+	//for the stream. Be sure to add a corresponding case in the
+	//python program.
+	//Serial.printf("Stream %d \n", bytestream_active);
+	 
+	// pack up data to send
+	unsigned long t=micros(); //send current time for x axis
+	memcpy(res_cmd->data, &t, 4); 
+	memcpy(res_cmd->data+4, &L_motor_val, 1);
+	memcpy(res_cmd->data+5, &R_motor_val, 1);
+	memcpy(res_cmd->data+6, &gyro_z, 4);
+	memcpy(res_cmd->data+10, &yaw_g, 4);    
+	amdtpsSendData((uint8_t *)res_cmd, 16);  //2 bytes for type and length, 14 bytes of data
+}
+									</code></pre>
 									<br>
-									<p></p>
+									<p>The code below was written to have the robot ramp up the control input to turn around its axis and then ramp back down while collecting yaw data.</p>
 									<br>
-									<p></p>
+									<pre><code>
+  counts++; //increment counts
+  if(counts>200)
+  {
+    // if its time for the next motor value, increase/decrease it
+    if(increase)
+    {
+      L_motor_val++;
+      R_motor_val++;
+    }
+    else
+    {
+      L_motor_val--;  //decrease speed
+      R_motor_val--;
+    }
+    counts=0;
+    if(L_motor_val==255||L_motor_val==0)
+    {
+      increase = !increase; //switch direction if cant increase anymore
+    }
+  }
+  //set motors
+  myMotorDriver.setDrive( L_MOTOR, FWD, L_motor_val);
+  myMotorDriver.setDrive( R_MOTOR, REV, R_motor_val);
+  
+  if( myICM.dataReady() )
+  {
+    t0 = micros();
+    myICM.getAGMT();                // The values are only updated when you call 'getAGMT'
+    
+    //---------------------yaw---------------------
+    gyro_z = myICM.gyrZ();  //z measurement from gyroscope (angular speed)
+    yaw_g = yaw_g-gyro_z*(float)dt/1000000;
+    }
+  else{
+    Serial.println("Waiting for data");
+    delay(500);
+  }
+									</code></pre>
 									<br>
-									<p></p>
+									<p>Around this point the connectors for one of my batteries broke so I had to take some time to solder that back together:</p>
 									<br>
-									<p></p>
-									<br>
-									<p></p>
-									<br>
-									<p></p>
-									<br>
-									<p></p>
-									<br>
-									<p></p>
+									<img class="img-fluid mb-5" src="Lab06/img/broke.png" alt="" / />
 									<br>
 									<p></p>
 									<br>
