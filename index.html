@@ -1438,6 +1438,9 @@ Serial.print("\t");
 									<img class="img-fluid mb-5" src="Lab06/img/north.png" alt="" / />
 									<br>
 									<p>The yaw value was found to be somewhat robust against small changes in roll and pitch especially if those small angle changes were along the axis perpendicular to the North-South direction.</p>
+									<p>It was found that when the IMU board was placed directly onto the car body, the magnetometer would no longer be able to read the yaw because of magnetic interference from the car motors. A foam “fin” was constructed to keep the IMU away from the motors which proved to be effective:</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab06/img/fin.png" alt="" / />
 									<br>
 									<p><u>PID Control</u></p>
 									<br>
@@ -1517,37 +1520,17 @@ if (bytestream_active)
 									<br>
 									<img class="img-fluid mb-5" src="Lab06/img/broke.png" alt="" / />
 									<br>
-									<p></p>
+									<p>After uploading my code, the motors seemed to ramp up and down as expected when the robot was lifted off of the ground, but when on the ground, it showed a very jerky response once it started spinning:</p>
 									<br>
-									<p></p>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/XkjCheyy_h8" allowfullscreen></iframe>
+									</div>
 									<br>
-									<p></p>
+									<p>The data obtained from one of these tests can be seen as less than desirable:</p>
 									<br>
-									<p></p>
+									<img class="img-fluid mb-5" src="Lab06/img/jerkydata.png" alt="" / />
 									<br>
-									<p></p>
-									<br>
-									<p></p>
-									<br>
-									<p></p>
-									<br>
-									<p></p>
-									<br>
-									<p></p>
-									<br>
-									<p></p>
-									<br>
-									<p></p>
-									<br>
-									<p></p>
-									<br>
-									<p></p>
-									<br>
-									<p></p>
-									<br>
-									<p></p>
-									<br>
-									<p></p>
+									<p>This problem persisted throughout three days of debugging. This process is mostly documented on <a href="https://campuswire.com/c/GBD54AB15/feed/83">Sparkfun’s website</a>. Because of this issue, the lab could not be completed on time.</p>
 									<br>
 									<h3>Part B: Odometry and Ground Truth in the Virtual Robot</h3>
 									<br>

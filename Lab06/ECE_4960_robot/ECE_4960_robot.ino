@@ -322,6 +322,8 @@ void loop()
     counts_control=0;
     if(L_motor_val==255||L_motor_val==0)
     {
+      
+      
       increase = !increase; //switch direction if cant increase anymore
     }
   }
@@ -343,7 +345,7 @@ void loop()
     delay(500);
   }
 
-    
+
     //Serial.println("Loop...."); //KHE Loops constantly....no delays
     //--------------------------------------BLUETOOTH-----------------------------------------------------------
     counts_data++;
