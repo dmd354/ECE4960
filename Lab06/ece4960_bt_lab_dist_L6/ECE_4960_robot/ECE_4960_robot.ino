@@ -1,4 +1,14 @@
-#include <stdint.h>
+
+/*
+  04/19/2020 Kerry Edited
+  AndroidArtemisBleUartClient
+  https://github.com/kerryeven/AndroidArtemisBleUartClient
+
+  June 2020 Ta-Weh Yeh Edited
+  https://github.com/TaWeiYeh/ArtemisBleApp
+
+  August 2020 Alex Coy Tailor for ECE 4960
+*/
 // maximum length of reply / data message
 #define MAXREPLY 100
 #define TODO_VAL 0
@@ -14,21 +24,16 @@ uint8_t *val_len = &val[1];  // store length of optional data
 #include "commands.h"
 #include "related_funcs.h"
 
-#include <Arduino.h>
-#include <stdint.h>
+/*
 #include "SCMD.h"
-#include "SCMD_config.h" //Contains #defines for common SCMD register names and values
-#include <ComponentObject.h>
-#include <RangeSensor.h>
-#include <SparkFun_VL53L1X.h>
-#include <vl53l1x_class.h>
-#include <vl53l1_error_codes.h>
-#include <Wire.h>
-#include "SparkFun_VL53L1X.h" 
-#include "SparkFun_VCNL4040_Arduino_Library.h"
-#include "ICM_20948.h"  // Click here to get the library: http://librarymanager/All#SparkFun_ICM_20948_IMU
-#include "math.h"
+#include "SCMD_config.h"
+*/
 
+/*
+#define ARM_MATH_CM4
+#include <arm_math.h>
+#include <math.h>
+*/
 /********************************************************************************************************************
                   OBJECTS
   *******************************************************************************************************************/
@@ -56,51 +61,6 @@ present_t presentSensors = {
     .IMU = 0};
 int bytestream_active = 0;
 
-VCNL4040 proximitySensor;
-
-//Optional interrupt and shutdown pins.
-#define SHUTDOWN_PIN 2
-#define INTERRUPT_PIN 3
-ICM_20948_I2C myICM;  // create an ICM_20948_I2C object
-SCMD myMotorDriver; //This creates the main object of one motor driver and connected slaves.
-
-SFEVL53L1X distanceSensor;
-//Uncomment the following line to use the optional shutdown and interrupt pins.
-//SFEVL53L1X distanceSensor(Wire, SHUTDOWN_PIN, INTERRUPT_PIN);
-
-#define AD0_VAL   1     // The value of the last bit of the I2C address. 
-// motot constants
-#define L_MOTOR 0
-#define R_MOTOR 1
-#define FWD 0
-#define REV 1
-
-float pitch_a;
-float roll_a;
-float alpha = 0.6;
-float pitch_a_LPF;
-float old_pitch = 0;
-float old_pitch_a = 0;
-float roll_a_LPF;
-float old_roll = 0;
-float old_roll_a = 0;
-float pitch_g=0;
-float roll_g=0;
-float yaw_g=0;
-float pitch=0;
-float roll=0;
-float xm;
-float ym;
-float yaw;
-float gyro_z;
-unsigned long t0; // start time
-unsigned long dt=0; // change in time
-unsigned char L_motor_val=1;  //value to send to left motor
-unsigned char R_motor_val=1;  //value to send to right motor
-unsigned int counts_control=0;
-unsigned int counts_data=0;
-bool increase=true;
-
 /*************************************************************************************************/
 /*!
      \fn     setup
@@ -116,8 +76,6 @@ bool increase=true;
 /*************************************************************************************************/
 void setup()
 {
-//-----------------------------------SETUP FOR BT-----------------------------------------------------------------
-    
     Serial.begin(115200);
     delay(1000);
 
@@ -241,133 +199,13 @@ void setup()
     //interrupts(); // Enable interrupt operation. Equivalent to am_hal_rtc_int_enable().
     //am_hal_wdt_start();
     //am_hal_wdt_int_enable(); - freezes boot
-//-----------------------------------SETUP FOR MOTORS-----------------------------------------------------------------
-  myMotorDriver.settings.commInterface = I2C_MODE;
-  myMotorDriver.settings.I2CAddress = 0x5D; //config pattern is "1000" (default) on board for address 0x5D
-  myMotorDriver.settings.chipSelectPin = 10;
-  //*****initialize the driver get wait for idle*****//
-  while ( myMotorDriver.begin() != 0xA9 ) //Wait until a valid ID word is returned
-  {
-    Serial.println( "ID mismatch, trying again" );
-    delay(500);
-  }
-  Serial.println( "ID matches 0xA9" );
-  //  Check to make sure the driver is done looking for slaves before beginning
-  Serial.print("Waiting for enumeration...");
-  while ( myMotorDriver.ready() == false );
-  // motor 1 inversion so that foward is the same for both motors
-  while ( myMotorDriver.busy() ); //Waits until the SCMD is available.
-  myMotorDriver.inversionMode(1, 1); //invert motor 1
-  while ( myMotorDriver.busy() );
-  myMotorDriver.enable();
 
-//-----------------------------------SETUP FOR SENSORS-----------------------------------------------------------------
-Wire.begin();
-  Wire.setClock(400000);
-  bool initialized = false;
-  while( !initialized )
-  {
-
-    myICM.begin( Wire, AD0_VAL );
-
-    Serial.print( F("Initialization of the sensor returned: ") );
-    Serial.println( myICM.statusString() );
-    if( myICM.status != ICM_20948_Stat_Ok )
-    {
-      Serial.println( "Trying again..." );
-      delay(500);
-    }
-    else{
-      initialized = true;
-    }
-  }
-  // Set full scale ranges for both acc and gyr
-  ICM_20948_fss_t myFSS;  // This uses a "Full Scale Settings" structure that can contain values for all configurable sensors
-  
-  myFSS.a = gpm2;         // (ICM_20948_ACCEL_CONFIG_FS_SEL_e)
-                          // gpm2
-                          // gpm4
-                          // gpm8
-                          // gpm16
-                          
-  myFSS.g = dps1000;       // (ICM_20948_GYRO_CONFIG_1_FS_SEL_e)
-                          // dps250
-                          // dps500
-                          // dps1000
-                          // dps2000
-                          
-  myICM.setFullScale( (ICM_20948_Internal_Acc | ICM_20948_Internal_Gyr), myFSS );  
-  myICM.begin( Wire, AD0_VAL );
-  if (proximitySensor.begin() == false)
-  {
-    Serial.println("Device not found. Please check wiring.");
-    while (1); //Freeze!
-  }
-  //Serial.println("VL53L1X Qwiic Test");
-  //VL53L1_SetInterMeasurementPeriodMilliSeconds(&VL53L1Dev, 1000 );
-  if (distanceSensor.begin() != 0) //Begin returns 0 on a good init
-  {
-    Serial.println("Sensor failed to begin. Please check wiring. Freezing...");
-    while (1);
-  }
-  Serial.println("Sensors online!");
-  distanceSensor.setTimingBudgetInMs(50);
-  distanceSensor.setIntermeasurementPeriod(5);
-  distanceSensor.setDistanceModeShort();
-  distanceSensor.startRanging(); //just continue ranging the whole time to save time turning it on/off
 } /*** END setup FCN ***/
 
 void loop()
 {
-  //------------------------------------ROBOT CONTROL----------------------------------------------------
-  
-  t0 = micros();
-  counts_control++; //increment counts
-  if(counts_control>200)
-  {
-    // if its time for the next motor value, incease/decrease it
-    if(increase)
-    {
-      L_motor_val++;
-      R_motor_val++;
-    }
-    else
-    {
-      L_motor_val--;  //decrease speed
-      R_motor_val--;
-    }
-    counts_control=0;
-    if(L_motor_val==255||L_motor_val==0)
-    {
-      
-      
-      increase = !increase; //switch direction if cant increase anymore
-    }
-  }
-  //set motors
-  myMotorDriver.setDrive( L_MOTOR, REV, L_motor_val); 
-  myMotorDriver.setDrive( R_MOTOR, FWD, R_motor_val);
-  
-  if( myICM.dataReady() )
-  {
-    myICM.getAGMT();                // The values are only updated when you call 'getAGMT'
-    
-    //---------------------yaw---------------------
-    gyro_z = myICM.gyrZ();  //z measurement from gyroscope (angular speed)
-    yaw_g = yaw_g-gyro_z*(float)dt/1000000;
-    xm = myICM.magX()*cos(pitch*M_PI/180)-myICM.magY()*sin(roll*M_PI/180)*sin(pitch)+myICM.magZ()*cos(roll*M_PI/180)*sin(pitch*M_PI/180); //these were saying theta=pitch and roll=phi
-    ym = myICM.magY()*cos(roll*M_PI/180) + myICM.magZ()*sin(roll*M_PI/180);
-    yaw = atan2(ym, xm)*180/M_PI;
-  }
-  else{
-    Serial.println("Waiting for data");
-    delay(500);
-  }
-
-
     //Serial.println("Loop...."); //KHE Loops constantly....no delays
-    //--------------------------------------BLUETOOTH-----------------------------------------------------------
-    counts_data++;
+
     if (l_Rcvd > 1) //Check if we have a new message from amdtps_main.c through BLE_example_funcs.cpp
     {
 
@@ -459,30 +297,66 @@ void loop()
 
     if (bytestream_active)
     {
-        if(counts_data>=20) //no need to send ALL the data
-        {
-          res_cmd->command_type = BYTESTREAM_TX;  //set command type to bytestream transmit
-          res_cmd->length = 14;                    //length doesn't matter since the handler will take care of this
-          //TODO: Put an example of a 32-bit integer and a 64-bit integer
-          //for the stream. Be sure to add a corresponding case in the
-          //python program.
-          //Serial.printf("Stream %d \n", bytestream_active);
-           
-          // pack up data to send
-          unsigned long t=micros(); //send current time for x axis
-          memcpy(res_cmd->data, &t, 4); 
-          memcpy(res_cmd->data+4, &L_motor_val, 1);
-          memcpy(res_cmd->data+5, &R_motor_val, 1);
-          memcpy(res_cmd->data+6, &gyro_z, 4);
-          memcpy(res_cmd->data+10, &yaw, 4);    
-          amdtpsSendData((uint8_t *)res_cmd, 16);  //2 bytes for type and length, 14 bytes of data
-          counts_data=0;
-        }
+        res_cmd->command_type = BYTESTREAM_TX;  //set command type to bytestream transmit
+        res_cmd->length = 14;                    //length doesn't matter since the handler will take care of this
+        //TODO: Put an example of a 32-bit integer and a 64-bit integer
+        //for the stream. Be sure to add a corresponding case in the
+        //python program.
+        //Serial.printf("Stream %d \n", bytestream_active);
+        
+        ((uint32_t *)(res_cmd->data))[0] = 32;  //put a 32 bit integer into data to send (4 bytes)
+        
+        uint64_t num = 64;
+        memcpy(res_cmd->data+4, &num, 8);       //put a 64 bit integer into data to send (8 bytes)
+      
+      
+        // send a little data
+        //amdtpsSendData((uint8_t *)res_cmd, 14);  //2 bytes for type and length, 12 bytes of data
+      
+        // send a lot of data
+        uint64_t num2 = 65;
+        memcpy(res_cmd->data+12, &num2, 8);       //put a 64 bit integer into data to send (8 bytes)
+        uint64_t num3 = 66;
+        memcpy(res_cmd->data+20, &num3, 8);       //put a 64 bit integer into data to send (8 bytes)
+        uint64_t num4 = 67;
+        memcpy(res_cmd->data+28, &num4, 8);       //put a 64 bit integer into data to send (8 bytes)
+        uint64_t num5 = 68;
+        memcpy(res_cmd->data+36, &num5, 8);       //put a 64 bit integer into data to send (8 bytes)
+        uint64_t num6 = 69;
+        memcpy(res_cmd->data+44, &num6, 6);       //put a 64 bit integer into data to send (8 bytes)     
+        uint64_t num7 = 70;
+        memcpy(res_cmd->data+52, &num7, 8);       //put a 64 bit integer into data to send (8 bytes)
+        uint64_t num8 = 70;
+        memcpy(res_cmd->data+60, &num8, 8);       //put a 64 bit integer into data to send (8 bytes)
+        amdtpsSendData((uint8_t *)res_cmd, 70);  //2 bytes for type and length, 68 bytes of data
+        
+        //Print time
+        unsigned long t = micros();
+        Serial.printf("Package %d sent at %d us \n", pkg_count, t);
+        pkg_count++;
     }
 
     trigger_timers();
-    dt = (micros()-t0); //time to run through entire loop in us
+
     // Disable interrupts.
 
+    /*
+    //Uncomment this if you want the board to go to sleep and be woken up
+    //by Timer2. Not good for instruction streaming!
 
+    am_hal_interrupt_master_disable();
+
+    //
+    // Check to see if the WSF routines are ready to go to sleep.
+    //
+    if (wsfOsReadyToSleep())
+    {
+        am_hal_sysctrl_sleep(AM_HAL_SYSCTRL_SLEEP_DEEP);
+    }
+    // Loop stops here on sleep and wakes on Timer2 interrupt, runs about 30 loops, then sleeps again.
+    // An interrupt woke us up so now enable them and take it.
+    am_hal_interrupt_master_enable();
+    */
+
+    delay(10);
 } //END LOOP

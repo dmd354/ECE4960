@@ -123,7 +123,7 @@ void loop()
   myMotorDriver.setDrive( L_MOTOR, REV, L_motor_val); 
   myMotorDriver.setDrive( R_MOTOR, FWD, R_motor_val);
  */  
-  myMotorDriver.setDrive( L_MOTOR, FWD, 255); 
-  myMotorDriver.setDrive( R_MOTOR, REV, 255);
+  myMotorDriver.setDrive( L_MOTOR, FWD, 200); 
+  myMotorDriver.setDrive( R_MOTOR, REV, 200);
    
 }

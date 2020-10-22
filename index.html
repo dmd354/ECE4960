@@ -1477,10 +1477,10 @@ if (bytestream_active)
 									<p>The code below was written to have the robot ramp up the control input to turn around its axis and then ramp back down while collecting yaw data.</p>
 									<br>
 									<pre><code>
-  counts++; //increment counts
-  if(counts>200)
+counts_control++; //increment counts
+  if(counts_control>200)
   {
-    // if its time for the next motor value, increase/decrease it
+    // if its time for the next motor value, incease/decrease it
     if(increase)
     {
       L_motor_val++;
@@ -1491,25 +1491,30 @@ if (bytestream_active)
       L_motor_val--;  //decrease speed
       R_motor_val--;
     }
-    counts=0;
+    counts_control=0;
     if(L_motor_val==255||L_motor_val==0)
     {
+      
+      
       increase = !increase; //switch direction if cant increase anymore
     }
   }
   //set motors
-  myMotorDriver.setDrive( L_MOTOR, FWD, L_motor_val);
-  myMotorDriver.setDrive( R_MOTOR, REV, R_motor_val);
-  
+  myMotorDriver.setDrive( L_MOTOR, REV, L_motor_val); 
+  myMotorDriver.setDrive( R_MOTOR, FWD, R_motor_val);
+
   if( myICM.dataReady() )
   {
-    t0 = micros();
     myICM.getAGMT();                // The values are only updated when you call 'getAGMT'
     
     //---------------------yaw---------------------
     gyro_z = myICM.gyrZ();  //z measurement from gyroscope (angular speed)
     yaw_g = yaw_g-gyro_z*(float)dt/1000000;
-    }
+    xm = myICM.magX()*cos(pitch*M_PI/180)-myICM.magY()*sin(roll*M_PI/180)*sin(pitch)+myICM.magZ()*cos(roll*M_PI/180)*sin(pitch*M_PI/180); //these were saying theta=pitch and roll=phi
+    ym = myICM.magY()*cos(roll*M_PI/180) + myICM.magZ()*sin(roll*M_PI/180);
+    yaw = atan2(ym, xm)*180/M_PI;
+    Serial.println(gyro_z);
+  }
   else{
     Serial.println("Waiting for data");
     delay(500);

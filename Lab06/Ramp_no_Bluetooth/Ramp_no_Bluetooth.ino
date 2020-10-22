@@ -83,8 +83,8 @@ void setup()
   Serial.println("setup complete");
 
 }
-unsigned char L_motor_val=50;  //value to send to left motor
-unsigned char R_motor_val=50;  //value to send to right motor
+unsigned char L_motor_val=70;  //value to send to left motor
+unsigned char R_motor_val=70;  //value to send to right motor
 unsigned int counts_control=0;
 //set motor constants
 #define L_MOTOR 0
@@ -121,5 +121,5 @@ void loop()
   Serial.println(L_motor_val);
   myMotorDriver.setDrive( L_MOTOR, REV, L_motor_val); 
   myMotorDriver.setDrive( R_MOTOR, FWD, R_motor_val);
-  delay(1000);
+  delay(100);
 }
