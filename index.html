@@ -1319,7 +1319,6 @@ if( myICM.dataReady() ){
     delay(30);
     
 }
-
 									</code></pre>
 									<br>
 									<p>The alpha value of 0.9 was found to not really reduce the noise in the signal, so the value was lowered to 0.3 which did a much better job of making the signal smooth. However, this also made the measurement lag a little more. Some sample data from the serial plotter can be found below. The filtered readings (red and yellow) are significantly less noisy.</p>
@@ -1535,7 +1534,223 @@ counts_control++; //increment counts
 									<br>
 									<img class="img-fluid mb-5" src="Lab06/img/jerkydata.png" alt="" / />
 									<br>
-									<p>This problem persisted throughout three days of debugging and no solution was found. This process is mostly documented on <a href="https://campuswire.com/c/GBD54AB15/feed/83">Campuswire</a>. Because of this issue, this part of the lab could not be completed on time.</p>
+									<p>This problem persisted throughout three days of debugging and no solution was found. This process is mostly documented on <a href="https://campuswire.com/c/GBD54AB15/feed/83">Campuswire</a>.</p>
+									<p>Eventually, I found that my issue was some combination of a week motor driver, and a floor that isn’t slippery enough. A new motor driver was put in the car, and the rest of the tests were run on the lab floor with some water on it to minimize friction as much as possible.</p>
+									<p>I found that the setup code I had written to expand the limit of values read by the gyroscope did not work. I tried implementing the code from the example code and I still found that my readings were limited to 250. This was resolved after much debugging by moving the setup code for the IMU to be at the very end of my setup function. This mysteriously solved the problem.</p>
+									<p>With my gyroscope working, and the slippery setup, the following data was obtained for the ramp response.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab06/img/ramp_response.png" alt="" / />
+									<br>
+									<p>The deadband before the robot starts spinning is up to an input of about 185, but it begins moving a little bit before that. The deadband once the robot is already spinning can be seen to be inputs below around 140. The maximum rotational speed recorded by the gyroscope was around 1590 dps. In this case, both motors started and stopped spinning pretty much at the same time.</p>
+									<p>To find the lowest speed I could reliably have the robot rotate at, several constant input values were tried. The data for each of these cases is plotted below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab06/img/step.png" alt="" / />
+									<br>
+									<p>At an input of 160 spinning at a rate around 630 dps is maintained. Below this, the motors are not able to overcome friction, and the robot just jerks around.</p>
+									<p>From lab 5, it was found that the ToF sensor takes about 45ms between measurements. MATLAB code was written to calculate the change in values associated with a rotational scan:</p>
+									<br>
+									<pre><code>
+dt = 0.045;  % time between sensor readings (s)
+omega = 630; % turning speed (deg/sec)
+r = 0.5;   % distance from wall (m)
+start_angle = 0;    % start angle (deg)
+final_angle = start_angle+omega*dt;
+d0 = r/cos(start_angle*pi/180);
+d1 = r/cos(final_angle*pi/180);
+w0 = d0*sin(start_angle*pi/180);
+w1 = d1*sin(final_angle*pi/180);
+
+fprintf('orientation changed by %d degrees\n', final_angle-start_angle);
+fprintf('distance reading changed by %d mm\n', (d1-d0)*1000);
+fprintf('distance along wall between readings = %d mm\n', (w1-w0)*1000);
+
+									</code></pre>
+									<br>
+									<p>For a rotational speed of 630 dps,the orientation would change by 28.3° between measurements. If staring perpendicular to a wall 0.5m away, the distance reading should change by  68.1mm and the reading would be 27.0mm away from the previous measurement along the wall. If staring at a 45° to the wall, the distance reading should change by 1037mm and the reading would be 1171mm away from the previous measurement along the wall. At this speed, an accurate rotational scan could not be achieved.</p>
+									<p>For the feedback controller entirely heuristic methods and a setpoint of 900 dps were used for tuning. Proportional control was implemented first because the simplest solution should always be tried first to avoid unnecessary complexity. Proportional control was implemented with the code below.</p>
+									<br>
+									<pre><code>
+if( myICM.dataReady() )
+    {
+      myICM.getAGMT();                // The values are only updated when you call 'getAGMT'
+      
+      //---------------------yaw---------------------
+      gyro_z = myICM.gyrZ();  //z measurement from gyroscope (angular speed)
+      yaw_g = yaw_g-gyro_z*(float)dt/1000000;
+      xm = myICM.magX()*cos(pitch*M_PI/180)-myICM.magY()*sin(roll*M_PI/180)*sin(pitch)+myICM.magZ()*cos(roll*M_PI/180)*sin(pitch*M_PI/180); //these were saying theta=pitch and roll=phi
+      ym = myICM.magY()*cos(roll*M_PI/180) + myICM.magZ()*sin(roll*M_PI/180);
+      yaw = atan2(ym, xm)*180/M_PI;
+
+      u = 1*error;
+
+      if(u>=0)
+      {
+        if(u>255)
+        {
+          L_motor_val = R_motor_val = 255;
+        }
+        else
+        {
+          L_motor_val = R_motor_val = u;
+        }
+        myMotorDriver.setDrive( L_MOTOR, REV, L_motor_val); 
+        myMotorDriver.setDrive( R_MOTOR, FWD, R_motor_val);
+      }
+      else
+      {
+        if(u&lt;-255)
+        {
+          L_motor_val = R_motor_val = 255;
+        }
+        else
+        {
+          L_motor_val = R_motor_val = -u;
+        }
+        myMotorDriver.setDrive( L_MOTOR, FWD, L_motor_val); 
+        myMotorDriver.setDrive( R_MOTOR, REV, R_motor_val);
+      }
+    }
+}
+									</code></pre>
+									<br>
+									<p>Results of several values of proportional gain are shown below.</p>
+									<p><i>Note: all plots from the feedback control tests show the setpoint in green, the gyroscope reading (dps) in red, and the control input magnitude in blue.</i></p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab06/img/P_control.png" alt="" / />
+									<br>
+									<p>A proportional gain of 1 gives a very stable response, but shows significant steady state error. A gain of 2 does a pretty good job of reducing this error. A gain of 5 ends up saturating the control input very often which is undesirable.</p>
+									<p>To further reduce the steady state error, integral control was added with the following code.</p>
+									<br>
+									<pre><code>
+ if (BT_connected) //start after bluetooth connection made
+  {
+    if( myICM.dataReady() )
+    {
+      myICM.getAGMT();                // The values are only updated when you call 'getAGMT'
+      
+      //---------------------yaw---------------------
+      gyro_z = myICM.gyrZ();  //z measurement from gyroscope (angular speed)
+      yaw_g = yaw_g-gyro_z*(float)dt/1000000;
+      xm = myICM.magX()*cos(pitch*M_PI/180)-myICM.magY()*sin(roll*M_PI/180)*sin(pitch)+myICM.magZ()*cos(roll*M_PI/180)*sin(pitch*M_PI/180); //these were saying theta=pitch and roll=phi
+      ym = myICM.magY()*cos(roll*M_PI/180) + myICM.magZ()*sin(roll*M_PI/180);
+      yaw = atan2(ym, xm)*180/M_PI;
+      
+      error = setpoint-gyro_z;
+      integral = integral_prior + error*dt/1000000;
+      u = 1*error + 0.1*integral;
+      error_prior = error;
+      integral_prior = integral;
+
+      if(u>=0)
+      {
+        if(u>255)
+        {
+          L_motor_val = R_motor_val = 255;
+        }
+        else
+        {
+          L_motor_val = R_motor_val = u;
+        }
+        myMotorDriver.setDrive( L_MOTOR, REV, L_motor_val); 
+        myMotorDriver.setDrive( R_MOTOR, FWD, R_motor_val);
+      }
+      else
+      {
+        if(u&lt;-255)
+        {
+          L_motor_val = R_motor_val = 255;
+        }
+        else
+        {
+          L_motor_val = R_motor_val = -u;
+        }
+        myMotorDriver.setDrive( L_MOTOR, FWD, L_motor_val); 
+        myMotorDriver.setDrive( R_MOTOR, REV, R_motor_val);
+      }
+}
+									</code></pre>
+									<br>
+									<p>Several combinations of proportional and integral gains were implemented to obtain the following data.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab06/img/PI_control.png" alt="" />
+									<br>
+									<p>Values of 1.8 for the proportional gain and 0.8 for the integral gain were found to give the best response that reached the setpoint quickly with little steady state error. These values were kept for the next parts of the lab.</p>
+									<p>With the control gain values chosen, the setpoint was lowered to see how slow the robot could spin. Results from several setpoints are plotted below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab06/img/sp.png" alt="" />
+									<br>
+									<p>With a setpoint of 200, the robot was able to turn reasonably well. At 100, only one set of the wheels turned, so 200 was determined to pretty much be the limit. This is less than a third of what was achieved with open loop control.</p>
+									<p>For a rotational speed of 200 dps, the orientation would change by 9° between ToF measurements. If staring perpendicular to a wall 0.5m away, the distance reading should change by  6.23mm and the reading would be 79.2mm away from the previous measurement along the wall.  If staring at a 45° to the wall, the distance reading should change by 144mm and the reading would be 188mm away from the previous measurement along the wall. This speed would produce a much better rotational scan, but for capturing more detail lower speed may be needed.</p>
+									<p>To reduce the speed even further, the control code was modified to only control the wheels on one side while the other side was set too a constant value of 60:</p>
+									<br>
+									<pre><code>
+if (BT_connected) //start after bluetooth connection made
+  {
+    if( myICM.dataReady() )
+    {
+      myICM.getAGMT();                // The values are only updated when you call 'getAGMT'
+      
+      //---------------------yaw---------------------
+      gyro_z = myICM.gyrZ();  //z measurement from gyroscope (angular speed)
+      yaw_g = yaw_g-gyro_z*(float)dt/1000000;
+      xm = myICM.magX()*cos(pitch*M_PI/180)-myICM.magY()*sin(roll*M_PI/180)*sin(pitch)+myICM.magZ()*cos(roll*M_PI/180)*sin(pitch*M_PI/180); //these were saying theta=pitch and roll=phi
+      ym = myICM.magY()*cos(roll*M_PI/180) + myICM.magZ()*sin(roll*M_PI/180);
+      yaw = atan2(ym, xm)*180/M_PI;
+
+      /*
+      if(counts_control>10000)
+      {
+        integral=0; //try to prevent windup
+        counts_control=0;
+      }*/
+      
+      error = setpoint-gyro_z;
+      integral = integral_prior + error*dt/1000000;
+      u = 1.8*error + 0.8*integral;
+      error_prior = error;
+      integral_prior = integral;
+
+      if(u>=0)
+      {
+        if(u>255)
+        {
+          L_motor_val = 255;
+          R_motor_val = 60;
+        }
+        else
+        {
+          L_motor_val = u; 
+          R_motor_val = 60;
+        }
+        myMotorDriver.setDrive( L_MOTOR, REV, L_motor_val); 
+        myMotorDriver.setDrive( R_MOTOR, FWD, R_motor_val);
+      }
+      else
+      {
+        if(u&lt;-255)
+        {
+          L_motor_val = 255;
+          R_motor_val = 60;
+        }
+        else
+        {
+          L_motor_val = -u;
+          R_motor_val = 60;
+        }
+        myMotorDriver.setDrive( L_MOTOR, FWD, L_motor_val); 
+        myMotorDriver.setDrive( R_MOTOR, REV, R_motor_val);
+      }
+    }
+}
+									</code></pre>
+									<br>
+									<p>Now, smaller setpoints were tried to get the following data.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab06/img/one_side.png" alt="" />
+									<br>
+									<p>The robot takes longer to get to these setpoints because it takes some time for the integrator term to accrue enough error to overcome the physical limitations of the motors and wheels, but I was able to achieve somewhat smooth rotation at a setpoint as low as 30 dps. Lower speeds are achievable with this method than in the two motor case because one side only supplies half the torque.</p>
+									<p>For a rotational speed of 30 dps,the orientation would change by 1.35°. If staring perpendicular to a wall, in the center of a 4x4m box, distance reading should change by  0.555mm and the reading would be 47.1mm away from the previous measurement along the wall.  If staring at a 45° to the wall (which would be beyond the worst case), the distance reading should change by 69.1mm and the reading would be 96.5mm away from the previous measurement along the wall. This means that obstacles or details smaller than 96mm may not be captured by the scan.</p>
+									<br>
 									<br>
 									<h3>Part B: Odometry and Ground Truth in the Virtual Robot</h3>
 									<br>
