@@ -91,7 +91,7 @@ float pitch=0;
 float roll=0;
 float xm;
 float ym;
-float yaw;
+float yaw_m;
 float gyro_z;
 unsigned long t0; // start time
 unsigned long dt=0; // change in time (itteration time)
@@ -100,12 +100,13 @@ unsigned char R_motor_val=0;  //value to send to right motor
 unsigned int counts_control=0;
 unsigned int counts_data=0;
 bool BT_connected=false;
-unsigned int setpoint=100;
+unsigned int setpoint=50;
 float error;
 float error_prior = 0;
 float integral = 0;
 float integral_prior = 0;
 float u;
+int distance;
 
 /*************************************************************************************************/
 /*!
@@ -286,7 +287,7 @@ void setup()
   Serial.println("Sensors online!");
   distanceSensor.setTimingBudgetInMs(50);
   distanceSensor.setIntermeasurementPeriod(5);
-  distanceSensor.setDistanceModeShort();
+  distanceSensor.setDistanceModeLong();
   distanceSensor.startRanging(); //just continue ranging the whole time to save time turning it on/off
 
 
@@ -404,184 +405,230 @@ void setup()
 
   Serial.println();
   Serial.println(F("Configuration complete!")); 
+
+  distanceSensor.setDistanceModeLong();
 } /*** END setup FCN ***/
 
+
+
+
+
+
+
+//---------------------------------------------------------------LOOP---------------------------------------------------------------------------------
 void loop()
 {
-  //------------------------------------ROBOT CONTROL----------------------------------------------------
   t0 = micros();
   counts_control++;
   if (BT_connected) //start after bluetooth connection made
   {
+    //SENSE
     if( myICM.dataReady() )
     {
+      //Yaw
       myICM.getAGMT();                // The values are only updated when you call 'getAGMT'
-      
-      //---------------------yaw---------------------
       gyro_z = myICM.gyrZ();  //z measurement from gyroscope (angular speed)
-      yaw_g = yaw_g-gyro_z*(float)dt/1000000;
-      xm = myICM.magX()*cos(pitch*M_PI/180)-myICM.magY()*sin(roll*M_PI/180)*sin(pitch)+myICM.magZ()*cos(roll*M_PI/180)*sin(pitch*M_PI/180); //these were saying theta=pitch and roll=phi
-      ym = myICM.magY()*cos(roll*M_PI/180) + myICM.magZ()*sin(roll*M_PI/180);
-      yaw = atan2(ym, xm)*180/M_PI;
-      
-      error = setpoint-gyro_z;
-      integral = integral_prior + error*dt/1000000;
-      u = 1.8*error + 0.8*integral;
-      error_prior = error;
-      integral_prior = integral;
+      yaw_g = -(yaw_g-gyro_z*(float)dt/1000000);
+      yaw_m = get_mag_yaw();
+      //disance
+    }  
+    if(distanceSensor.checkForDataReady())
+    {  
+      distance = distanceSensor.getDistance(); //Get the result of the measurement from ToF sensor
+      distanceSensor.clearInterrupt();
+      Serial.println(distance);
+      byte rangeStatus = distanceSensor.getRangeStatus();
+    }
+    //ACT
+    PI_spin();
+  }
+  bluetooth_com();  //bluetooth communication
+  dt = (micros()-t0); //time to run through entire loop in us
+} //END LOOP
+//---------------------------------------------------------------LOOP---------------------------------------------------------------------------------
 
-      if(u>=0)
-      {
-        if(u>255)
-        {
-          L_motor_val = R_motor_val = 255;
-        }
-        else
-        {
-          L_motor_val = R_motor_val = u;
-        }
-        myMotorDriver.setDrive( L_MOTOR, REV, L_motor_val); 
-        myMotorDriver.setDrive( R_MOTOR, FWD, R_motor_val);
-      }
-      else
-      {
-        if(u<-255)
-        {
-          L_motor_val = R_motor_val = 255;
-        }
-        else
-        {
-          L_motor_val = R_motor_val = -u;
-        }
-        myMotorDriver.setDrive( L_MOTOR, FWD, L_motor_val); 
-        myMotorDriver.setDrive( R_MOTOR, REV, R_motor_val);
-      }
+
+
+
+
+
+
+float get_mag_yaw(void)
+{
+  xm = myICM.magX()*cos(pitch*M_PI/180)-myICM.magY()*sin(roll*M_PI/180)*sin(pitch)+myICM.magZ()*cos(roll*M_PI/180)*sin(pitch*M_PI/180); //these were saying theta=pitch and roll=phi
+  ym = myICM.magY()*cos(roll*M_PI/180) + myICM.magZ()*sin(roll*M_PI/180);
+  //Serial.print(xm);
+  //Serial.print("\t");
+  //Serial.print(ym);
+  //Serial.print("\n");
+  return atan2(ym, xm)*180/M_PI;
+}
+
+void PI_spin(void)
+{
+  // function that uses PI control to spin the robot
+  error = setpoint-gyro_z;
+  integral = integral_prior + error*dt/1000000;
+  u = 1.8*error + 0.8*integral;
+  error_prior = error;
+  integral_prior = integral;
+
+  if(u>=0)
+  {
+    if(u>255)
+    {
+      L_motor_val = 255;
+      R_motor_val = 60;
     }
-    
-    else{
-      Serial.println("Waiting for data");
-      delay(500);
+    else
+    {
+      L_motor_val = u; 
+      R_motor_val = 60;
     }
+    myMotorDriver.setDrive( L_MOTOR, REV, L_motor_val); 
+    myMotorDriver.setDrive( R_MOTOR, FWD, R_motor_val);
+  }
+  else
+  {
+    if(u<-255)
+    {
+      L_motor_val = 255;
+      R_motor_val = 60;
+    }
+    else
+    {
+      L_motor_val = -u;
+      R_motor_val = 60;
+    }
+    myMotorDriver.setDrive( L_MOTOR, FWD, L_motor_val); 
+    myMotorDriver.setDrive( R_MOTOR, REV, R_motor_val);
+    /*
+      if(counts_control>10000)
+      {
+        integral=0; //try to prevent windup
+        counts_control=0;
+      }*/
+  }
+}
+
+void bluetooth_com(void)
+{
+  //function does all bluetooth communication
+  //Serial.println("Loop...."); //KHE Loops constantly....no delays
+  //--------------------------------------BLUETOOTH-----------------------------------------------------------
+  counts_data++;
+  if (l_Rcvd > 1) //Check if we have a new message from amdtps_main.c through BLE_example_funcs.cpp
+  {
+
+      cmd = (cmd_t *)m_Rcvd;
+      /*
+      Serial.print("Message Buffer: ");
+      for (int i = 0; i < l_Rcvd; i++)
+          Serial.printf("%d ", m_Rcvd[i]);
+      Serial.println();
+      Serial.printf("Got command: 0x%x Length: 0x%x Data: ", cmd->command_type, cmd->length);
+
+      for (int i = 0; i < cmd->length; i++)
+      {
+          Serial.printf("0x%x ", cmd->data[i]);
+      }
+      Serial.println();
+      */
+
+      switch (cmd->command_type)
+      {
+      case SET_MOTORS:
+
+          Serial.println("Placeholder: Set Motors");
+
+          break;
+      case GET_MOTORS:
+
+          Serial.println("Placeholder: Set Motors");
+          //amdtpsSendData((uint8_t *)res_cmd, *val_len);
+          break;
+      case SER_RX:
+          Serial.println("Got a serial message");
+          pushMessage((char *)&cmd->data, cmd->length);
+          break;
+      case REQ_FLOAT:
+          Serial.println("Going to send a float");
+          //TODO: Put a float (perhaps pi) into a command response and send it.
+          res_cmd->command_type = GIVE_FLOAT;     //set command type as GIVE_FLOAT
+          res_cmd->length=6;                      //length doesn't matter since the handler will take care of this
+          ((float *)(res_cmd->data))[0] = 1.23f;  //put a float into data to send
+          amdtpsSendData((uint8_t *)res_cmd, 6);  //2 bytes for type and length, 4 bytes of data
+          break;
+      case PING:
+          Serial.println("Ping Pong");
+          cmd->command_type = PONG;
+          amdtpsSendData(m_Rcvd, l_Rcvd);
+          break;
+      case START_BYTESTREAM_TX:
+          bytestream_active = (int)cmd->data[0];
+          //Serial.printf("Start bytestream with active %d \n", bytestream_active);
+          ((uint32_t *)res_cmd->data)[0] = 0;
+          bytestream_active = 1;
+          break;
+      case STOP_BYTESTREAM_TX:
+          bytestream_active = 0;
+          break;
+      default:
+          Serial.printf("Unsupported Command 0x%x \n", cmd->command_type);
+          break;
+      }
+
+      l_Rcvd = 0;
+      am_hal_wdt_restart();
+      free(m_Rcvd);
+  } //End if s_Rcvd != 100
+  else if ((s_Rcvd[0] == '6' && s_Rcvd[1] == '7'))
+  {
+      s_Rcvd[0] = 0;
+      digitalWrite(LED_BUILTIN, HIGH);
+      //Serial.printf("Connected, length was %d", l_Rcvd);
+  }
+  else if ((s_Rcvd[0] == '6' && s_Rcvd[1] == '8'))
+  {
+      digitalWrite(LED_BUILTIN, LOW);
+      Serial.println("disconnected");
+      //Decimal value of D for Disconnect
+      //Serial.println("got disconnect from case in ino file - set_Stop");
+      digitalWrite(LED_BUILTIN, LOW);
+      //amdtps_conn_close();
+      DmDevReset();
   }
 
+  if (availableMessage())
+  {
+      Serial.println("Bluetooth Message:");
+      Serial.println(pullMessage());
+      printOverBluetooth("Message Received.");
+  }
 
-    //Serial.println("Loop...."); //KHE Loops constantly....no delays
-    //--------------------------------------BLUETOOTH-----------------------------------------------------------
-    counts_data++;
-    if (l_Rcvd > 1) //Check if we have a new message from amdtps_main.c through BLE_example_funcs.cpp
-    {
+  if (bytestream_active)
+  {
+      BT_connected=true;
+      res_cmd->command_type = BYTESTREAM_TX;  //set command type to bytestream transmit
+      res_cmd->length = 14;                    //length doesn't matter since the handler will take care of this
+      //TODO: Put an example of a 32-bit integer and a 64-bit integer
+      //for the stream. Be sure to add a corresponding case in the
+      //python program.
+      //Serial.printf("Stream %d \n", bytestream_active);
+       
+      // pack up data to send
+      unsigned long t=micros(); //send current time for x axis
+      memcpy(res_cmd->data, &t, 4); 
+      memcpy(res_cmd->data+4, &L_motor_val, 1);
+      memcpy(res_cmd->data+5, &R_motor_val, 1);
+      memcpy(res_cmd->data+6, &gyro_z, 4);
+      memcpy(res_cmd->data+10, &yaw_g, 4);
+      memcpy(res_cmd->data+14, &distance, 4);    
+      amdtpsSendData((uint8_t *)res_cmd, 20);  //2 bytes for type and length, 18 bytes of data
+      counts_data=0;
 
-        cmd = (cmd_t *)m_Rcvd;
-        /*
-        Serial.print("Message Buffer: ");
-        for (int i = 0; i < l_Rcvd; i++)
-            Serial.printf("%d ", m_Rcvd[i]);
-        Serial.println();
-        Serial.printf("Got command: 0x%x Length: 0x%x Data: ", cmd->command_type, cmd->length);
+  }
 
-        for (int i = 0; i < cmd->length; i++)
-        {
-            Serial.printf("0x%x ", cmd->data[i]);
-        }
-        Serial.println();
-        */
-
-        switch (cmd->command_type)
-        {
-        case SET_MOTORS:
-
-            Serial.println("Placeholder: Set Motors");
-
-            break;
-        case GET_MOTORS:
-
-            Serial.println("Placeholder: Set Motors");
-            //amdtpsSendData((uint8_t *)res_cmd, *val_len);
-            break;
-        case SER_RX:
-            Serial.println("Got a serial message");
-            pushMessage((char *)&cmd->data, cmd->length);
-            break;
-        case REQ_FLOAT:
-            Serial.println("Going to send a float");
-            //TODO: Put a float (perhaps pi) into a command response and send it.
-            res_cmd->command_type = GIVE_FLOAT;     //set command type as GIVE_FLOAT
-            res_cmd->length=6;                      //length doesn't matter since the handler will take care of this
-            ((float *)(res_cmd->data))[0] = 1.23f;  //put a float into data to send
-            amdtpsSendData((uint8_t *)res_cmd, 6);  //2 bytes for type and length, 4 bytes of data
-            break;
-        case PING:
-            Serial.println("Ping Pong");
-            cmd->command_type = PONG;
-            amdtpsSendData(m_Rcvd, l_Rcvd);
-            break;
-        case START_BYTESTREAM_TX:
-            bytestream_active = (int)cmd->data[0];
-            //Serial.printf("Start bytestream with active %d \n", bytestream_active);
-            ((uint32_t *)res_cmd->data)[0] = 0;
-            bytestream_active = 1;
-            break;
-        case STOP_BYTESTREAM_TX:
-            bytestream_active = 0;
-            break;
-        default:
-            Serial.printf("Unsupported Command 0x%x \n", cmd->command_type);
-            break;
-        }
-
-        l_Rcvd = 0;
-        am_hal_wdt_restart();
-        free(m_Rcvd);
-    } //End if s_Rcvd != 100
-    else if ((s_Rcvd[0] == '6' && s_Rcvd[1] == '7'))
-    {
-        s_Rcvd[0] = 0;
-        digitalWrite(LED_BUILTIN, HIGH);
-        //Serial.printf("Connected, length was %d", l_Rcvd);
-    }
-    else if ((s_Rcvd[0] == '6' && s_Rcvd[1] == '8'))
-    {
-        digitalWrite(LED_BUILTIN, LOW);
-        Serial.println("disconnected");
-        //Decimal value of D for Disconnect
-        //Serial.println("got disconnect from case in ino file - set_Stop");
-        digitalWrite(LED_BUILTIN, LOW);
-        //amdtps_conn_close();
-        DmDevReset();
-    }
-
-    if (availableMessage())
-    {
-        Serial.println("Bluetooth Message:");
-        Serial.println(pullMessage());
-        printOverBluetooth("Message Received.");
-    }
-
-    if (bytestream_active)
-    {
-        BT_connected=true;
-        res_cmd->command_type = BYTESTREAM_TX;  //set command type to bytestream transmit
-        res_cmd->length = 14;                    //length doesn't matter since the handler will take care of this
-        //TODO: Put an example of a 32-bit integer and a 64-bit integer
-        //for the stream. Be sure to add a corresponding case in the
-        //python program.
-        //Serial.printf("Stream %d \n", bytestream_active);
-         
-        // pack up data to send
-        unsigned long t=micros(); //send current time for x axis
-        memcpy(res_cmd->data, &t, 4); 
-        memcpy(res_cmd->data+4, &L_motor_val, 1);
-        memcpy(res_cmd->data+5, &R_motor_val, 1);
-        memcpy(res_cmd->data+6, &gyro_z, 4);
-        memcpy(res_cmd->data+10, &gyro_z, 4);    
-        amdtpsSendData((uint8_t *)res_cmd, 16);  //2 bytes for type and length, 14 bytes of data
-        counts_data=0;
-
-    }
-
-    trigger_timers();
-    dt = (micros()-t0); //time to run through entire loop in us
-    // Disable interrupts.
-
-
-} //END LOOP
+  trigger_timers();
+  // Disable interrupts.
+}

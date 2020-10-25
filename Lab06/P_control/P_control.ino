@@ -424,18 +424,7 @@ void loop()
       ym = myICM.magY()*cos(roll*M_PI/180) + myICM.magZ()*sin(roll*M_PI/180);
       yaw = atan2(ym, xm)*180/M_PI;
 
-      /*
-      if(counts_control>10000)
-      {
-        integral=0; //try to prevent windup
-        counts_control=0;
-      }*/
-      
-      error = setpoint-gyro_z;
-      integral = integral_prior + error*dt/1000000;
-      u = 1.8*error + 0.8*integral;
-      error_prior = error;
-      integral_prior = integral;
+      u = 1*error;
 
       if(u>=0)
       {

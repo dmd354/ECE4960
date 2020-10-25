@@ -1,0 +1,165 @@
+ > Lab Work Directory: /home/artemis/catkin_ws/src/
+   /home/artemis/catkin_ws/src/lab7/scripts/robot_interface.py
+------- STEP: 1 -------
+Archive:  lab7.zip
+  inflating: /home/artemis/catkin_ws/src/lab7/launch/work.launch  
+  inflating: /home/artemis/catkin_ws/src/lab7/msg/SimPose.msg  
+  inflating: /home/artemis/catkin_ws/src/lab7/msg/PlotPoint.msg  
+  inflating: /home/artemis/catkin_ws/src/lab7/msg/MapPoints.msg  
+  inflating: /home/artemis/catkin_ws/src/lab7/msg/PlotPose.msg  
+  inflating: /home/artemis/catkin_ws/src/lab7/scripts/robot_interface.py  
+  inflating: /home/artemis/catkin_ws/src/lab7/scripts/plotter_config.ini  
+  inflating: /home/artemis/catkin_ws/src/lab7/scripts/Traj.py  
+  inflating: /home/artemis/catkin_ws/src/lab7/scripts/lab7a.ipynb  
+  inflating: /home/artemis/catkin_ws/src/lab7/scripts/lab7b.ipynb  
+  inflating: /home/artemis/catkin_ws/src/lab7/scripts/loc_utils.py  
+  inflating: /home/artemis/catkin_ws/src/lab7/package.xml  
+  inflating: /home/artemis/catkin_ws/src/lab7/CMakeLists.txt  
+  inflating: /home/artemis/catkin_ws/src/lab7/srv/ProbDist.srv  
+  inflating: /home/artemis/catkin_ws/src/lab7/srv/MapInit.srv  
+  inflating: /home/artemis/catkin_ws/src/lab7/world/maze.png  
+  inflating: /home/artemis/catkin_ws/src/lab7/world/empty.pgm  
+  inflating: /home/artemis/catkin_ws/src/lab7/world/map_1.pgm  
+  inflating: /home/artemis/catkin_ws/src/lab7/world/models.world  
+  inflating: /home/artemis/catkin_ws/src/lab7/world/playground.world  
+  inflating: /home/artemis/catkin_ws/src/lab7/src/plotter.py  
+  inflating: /home/artemis/catkin_ws/src/lab7/src/stageros_lab7.cpp  
+  inflating: /home/artemis/catkin_ws/src/lab7/src/teleop_keyboard.py  
+------- STEP: 2 -------
+
+source /opt/ros/melodic/setup.bash
+source /home/artemis/catkin_ws/devel/setup.bash
+
+source ~/.bash_aliases
+--- ls:
+-rwxr-xr-x 1 artemis artemis 360 Oct 24 08:42 /home/artemis/.bash_aliases
+--- cat:
+alias lab3-manager="mon launch lab3 work.launch --no-start"
+alias lab4-manager="mon launch lab4 work.launch --no-start"
+alias lab5-manager="mon launch lab5 work.launch --no-start"
+alias lab6-manager="mon launch lab6 work.launch --no-start"
+alias lab7-manager="mon launch lab7 work.launch --no-start"
+alias robot-keyboard-teleop="rosrun lab7 teleop_keyboard.py"
+------- STEP: 3 -------
+[  0%] Built target _lab3_generate_messages_check_deps_PlotPose
+[  0%] Built target nav_msgs_generate_messages_nodejs
+[  0%] Built target geometry_msgs_generate_messages_nodejs
+[  0%] Built target std_msgs_generate_messages_nodejs
+[  0%] Built target _lab3_generate_messages_check_deps_PlotPoint
+[  0%] Built target _lab3_generate_messages_check_deps_MapPoints
+[  0%] Built target _lab3_generate_messages_check_deps_SimPose
+[  3%] Built target lab3_generate_messages_nodejs
+[  3%] Built target geometry_msgs_generate_messages_py
+[  3%] Built target nav_msgs_generate_messages_py
+[  3%] Built target std_msgs_generate_messages_py
+[  7%] Built target lab3_generate_messages_py
+[  7%] Built target geometry_msgs_generate_messages_eus
+[  7%] Built target nav_msgs_generate_messages_eus
+[  7%] Built target std_msgs_generate_messages_eus
+[ 11%] Built target lab3_generate_messages_eus
+[ 11%] Built target geometry_msgs_generate_messages_cpp
+[ 11%] Built target std_msgs_generate_messages_cpp
+[ 11%] Built target nav_msgs_generate_messages_cpp
+[ 15%] Built target lab3_generate_messages_cpp
+[ 15%] Built target geometry_msgs_generate_messages_lisp
+[ 15%] Built target nav_msgs_generate_messages_lisp
+[ 15%] Built target std_msgs_generate_messages_lisp
+[ 17%] Built target lab3_generate_messages_lisp
+[ 17%] Built target lab3_generate_messages
+[ 17%] Built target sensor_msgs_generate_messages_py
+[ 17%] Built target tf2_msgs_generate_messages_nodejs
+[ 17%] Built target tf2_msgs_generate_messages_py
+[ 17%] Built target tf2_msgs_generate_messages_lisp
+[ 17%] Built target tf2_msgs_generate_messages_eus
+[ 17%] Built target tf2_msgs_generate_messages_cpp
+[ 17%] Built target actionlib_generate_messages_py
+[ 17%] Built target actionlib_generate_messages_nodejs
+[ 17%] Built target actionlib_generate_messages_eus
+[ 17%] Built target tf_generate_messages_nodejs
+[ 17%] Built target tf_generate_messages_lisp
+[ 17%] Built target tf_generate_messages_eus
+[ 17%] Built target tf_generate_messages_cpp
+[ 17%] Built target std_srvs_generate_messages_py
+[ 17%] Built target actionlib_generate_messages_lisp
+[ 17%] Built target std_srvs_generate_messages_nodejs
+[ 17%] Built target std_srvs_generate_messages_lisp
+[ 17%] Built target rosgraph_msgs_generate_messages_eus
+[ 17%] Built target actionlib_msgs_generate_messages_cpp
+[ 17%] Built target std_srvs_generate_messages_cpp
+[ 17%] Built target roscpp_generate_messages_lisp
+[ 17%] Built target sensor_msgs_generate_messages_cpp
+[ 17%] Built target sensor_msgs_generate_messages_eus
+[ 17%] Built target actionlib_msgs_generate_messages_nodejs
+[ 17%] Built target rosgraph_msgs_generate_messages_nodejs
+[ 17%] Built target rosgraph_msgs_generate_messages_py
+[ 17%] Built target roscpp_generate_messages_py
+[ 17%] Built target actionlib_msgs_generate_messages_eus
+[ 17%] Built target actionlib_msgs_generate_messages_lisp
+[ 17%] Built target actionlib_msgs_generate_messages_py
+[ 17%] Built target roscpp_generate_messages_nodejs
+[ 17%] Built target roscpp_generate_messages_eus
+[ 17%] Built target rosgraph_msgs_generate_messages_cpp
+[ 17%] Built target rosgraph_msgs_generate_messages_lisp
+[ 17%] Built target std_srvs_generate_messages_eus
+[ 17%] Built target sensor_msgs_generate_messages_lisp
+[ 17%] Built target actionlib_generate_messages_cpp
+[ 17%] Built target roscpp_generate_messages_cpp
+[ 17%] Built target sensor_msgs_generate_messages_nodejs
+[ 17%] Built target tf_generate_messages_py
+[ 19%] Built target stageros
+[ 19%] Built target _lab4_generate_messages_check_deps_PlotPoint
+[ 19%] Built target _lab4_generate_messages_check_deps_PlotPose
+[ 19%] Built target _lab4_generate_messages_check_deps_SimPose
+[ 19%] Built target _lab4_generate_messages_check_deps_MapPoints
+[ 22%] Built target lab4_generate_messages_nodejs
+[ 25%] Built target lab4_generate_messages_py
+[ 29%] Built target lab4_generate_messages_cpp
+[ 32%] Built target lab4_generate_messages_eus
+[ 35%] Built target lab4_generate_messages_lisp
+[ 35%] Built target lab4_generate_messages
+[ 36%] Built target stageros_lab4
+[ 36%] Built target _lab5_generate_messages_check_deps_SimPose
+[ 36%] Built target _lab5_generate_messages_check_deps_PlotPose
+[ 36%] Built target _lab5_generate_messages_check_deps_PlotPoint
+[ 36%] Built target _lab5_generate_messages_check_deps_MapPoints
+[ 39%] Built target lab5_generate_messages_nodejs
+[ 43%] Built target lab5_generate_messages_cpp
+[ 47%] Built target lab5_generate_messages_eus
+[ 51%] Built target lab5_generate_messages_py
+[ 53%] Built target lab5_generate_messages_lisp
+[ 53%] Built target lab5_generate_messages
+[ 55%] Built target stageros_lab5
+[ 55%] Built target _lab6_generate_messages_check_deps_PlotPose
+[ 55%] Built target _lab6_generate_messages_check_deps_MapPoints
+[ 55%] Built target _lab6_generate_messages_check_deps_PlotPoint
+[ 55%] Built target _lab6_generate_messages_check_deps_SimPose
+[ 59%] Built target lab6_generate_messages_py
+[ 62%] Built target lab6_generate_messages_cpp
+[ 65%] Built target lab6_generate_messages_eus
+[ 68%] Built target lab6_generate_messages_lisp
+[ 72%] Built target lab6_generate_messages_nodejs
+[ 72%] Built target lab6_generate_messages
+[ 73%] Built target stageros_lab6
+[ 74%] Building CXX object lab7/CMakeFiles/stageros_lab7.dir/src/stageros_lab7.cpp.o
+/home/artemis/catkin_ws/src/lab7/src/stageros_lab7.cpp:57:10: fatal error: lab7/SimPose.h: No such file or directory
+ #include <lab7/SimPose.h>
+          ^~~~~~~~~~~~~~~~
+compilation terminated.
+lab7/CMakeFiles/stageros_lab7.dir/build.make:62: recipe for target 'lab7/CMakeFiles/stageros_lab7.dir/src/stageros_lab7.cpp.o' failed
+make[2]: *** [lab7/CMakeFiles/stageros_lab7.dir/src/stageros_lab7.cpp.o] Error 1
+CMakeFiles/Makefile2:4893: recipe for target 'lab7/CMakeFiles/stageros_lab7.dir/all' failed
+make[1]: *** [lab7/CMakeFiles/stageros_lab7.dir/all] Error 2
+Makefile:140: recipe for target 'all' failed
+make: *** [all] Error 2
+Base path: /home/artemis/catkin_ws
+Source space: /home/artemis/catkin_ws/src
+Build space: /home/artemis/catkin_ws/build
+Devel space: /home/artemis/catkin_ws/devel
+Install space: /home/artemis/catkin_ws/install
+####
+#### Running command: "make cmake_check_build_system" in "/home/artemis/catkin_ws/build"
+####
+####
+#### Running command: "make -j1 -l1" in "/home/artemis/catkin_ws/build"
+####
+Invoking "make -j1 -l1" failed

@@ -1835,10 +1835,255 @@ while 1: # infinite loop
                                     <div class="divider-custom">
                                         <div class="divider-custom-line"></div>
                                     </div>
-                                    <!-- Lab Modal - Image-->
-                                    <!--<img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="" />-->
-                                    <!-- Lab Modal - Text-->
-                                    <p class="mb-5">Coming soon...</p>
+									<h3>Abstract</h3>
+									<br>
+									<p>In this lab, pseudo code was written for some supporting functions for the bayes filter, and a physical workspace was mapped out using the turning control developed in Lab 6 and the time of flight sensor.</p>
+									<br>
+									<h3>Part A: Grid Localization using Bayes Filter</h3>
+									<br>
+									<p>When I tried to set up the base cedeI got an error saying, “FAILURE: Could not setup lab base code”. This issue was resolved by deleting the folders currently held in the catkin workspace (after backing them up of course).</p>
+									<p>The lab manager was started and the JupyterLab notebook for lab7a was opened.</p>
+									<p>The code in the Execute Trajectory section was run, the simulated robot made turns and followed straight paths around one of the obstacles.</p>
+									<p>The Pseudocode for the Bayes Filter supporting functions with comments explaining operation can be found below.</p>
+									<br>
+									<pre><code>
+# In world coordinates
+def compute_control(cur_pose, prev_pose):
+    """ Given the current and previous odometry poses, this function extracts
+    the control information based on the odometry motion model.
+
+    Args:
+        cur_pose  ([Pose]): Current Pose
+        prev_pose ([Pose]): Previous Pose 
+
+    Returns:
+        [delta_rot_1]: Rotation 1  (degrees)
+        [delta_trans]: Translation (meters)
+        [delta_rot_2]: Rotation 2  (degrees)
+    """
+    x_dist = cur_pose[0]-prev_pose[0] # distance traveled in x direction
+    y_dist = cur_pose[1]-prev_pose[1] # distance traveled in y direction
+    trans_angle = atan2(y_dist, x_dist) # angle at which translation happened
+    delta_rot_1 = trans_angle-prev_pose[2] # rotaion from start pose to translation angle
+    if abs(delta_rot_1)>180: # correct to turn the shortest angle
+        delta_rot_1 = sign(delta_rot_1)*(abs(delta_rot_1)-360)
+    delta_trans = sqrt(x_dist**2+y_dist**2) # euclidean distance
+    delta_rot_2 = cur_pose-trans_angle # rotation from translation angle to final pose
+    if abs(delta_rot_2)>180: # correct to turn the shortest angle
+        delta_rot_1 = sign(delta_rot_2)*(abs(delta_rot_2)-360)
+    return delta_rot_1, delta_trans, delta_rot_2
+
+# In world coordinates
+def odom_motion_model(cur_pose, prev_pose, u):
+    """ Odometry Motion Model
+
+    Args:
+        cur_pose  ([Pose]): Current Pose
+        prev_pose ([Pose]): Previous Pose
+        (rot1, trans, rot2) (float, float, float): A tuple with control data in the format 
+                                                   format (rot1, trans, rot2) with units (degrees, meters, degrees)
+
+    Returns:
+        prob [float]: Probability p(x'|x, u)
+    """
+    # called Transition Probability / Action Model in lecture notes
+    
+    # find the movement between previous and current timestep
+    movement = compute_control(cur_pose, prev_pose)
+    
+    P_rot_1 = loc.gaussian(movement[0], u[0], odom_rot_sigma) # probability of rotation 1 given control
+    P_y = loc.gaussian(movement[1], u[1], odom_trans_sigma) # probability of translation given control
+    P_yaw = loc.gaussian(movement[2], u[2], odom_rot_sigma) # probability of rotation 2 given control
+    
+    prob = P_x*P_y*P_yaw # assume independent probabilities
+        
+    return prob
+
+def prediction_step(cur_odom, prev_odom, xt):
+    """ Prediction step of the Bayes Filter.
+    Update the probabilities in loc.bel_bar based on loc.bel from the previous time step and the odometry motion model.
+
+    Args:
+        cur_odom  ([Pose]): Current Pose
+        prev_odom ([Pose]): Previous Pose
+    """
+    # added xt as an input so that when looping through all states the prediction can be done for state, xt
+    u = compute_control(cur_odom, prev_odom)
+    sum = 0 #initialize sum
+    # for all possible previous states
+    for all x_positons in grid:   
+        for all y_posiions in grid:
+            for all yaw_angles in grid:
+                x_prev = [x_posiotn, y_position, yaw_angle] # previous pose
+                # sum product of transition probability from each previous pose and belief at that previous pose
+                sum = sum + odom_motion_model(xt, [x_prev], u)*loc.bel[x_pev]
+    loc.bel_bar = sum # prediction
+        
+def sensor_model(obs, xt):
+    """ This is the equivalent of p(z|x).
+
+    Args:
+        obs ([ndarray]): A 1D array consisting of the measurements made in rotation loop
+
+    Returns:
+        [ndarray]: Returns a 1D array of size 18 (=loc.OBS_PER_CELL) with the likelihood of each individual measurements
+    """
+    prob_array = array of 18 0s # initialize probability array to be filled in
+    views = get_views(xt[0], xt[1], xt[2])  # expected views at particular state xt
+    for index in [0:17]:
+        # pull probabilities from a normal distribution centered at the expected sensor reading
+        prob_array[index] = loc.gaussian(obs[index], views[index], loc.sensor_sigma)
+    return prob_array
+
+def update_step(xt, z):
+    """ Update step of the Bayes Filter.
+    Update the probabilities in loc.bel based on loc.bel_bar and the sensor model.
+    """
+    # update for state xt with measurement z
+    sens = sensor_model(z, xt) # P(z|xt)                    
+    loc.bel = sensor_model*loc.bel_bar
+    # assume that eta is calculated later
+
+									</code></pre>
+									<br>
+									<p>This pseudocode will be helpful when trying to write functions for implementing a real bayes filter.</p>
+									<br>
+									<h3>Part B: Mapping</h3>
+									<br>
+									<p>I rearranged some furniture and added some boxes to my kitchen to create a small workspace for the robot. A peninsula was added in the form of a tissue box. To fix the issue of the floor not being slippery enough that I ran into in lab 6, I covered the floor of the workspace with some silicone spray lubricant which proved to be very effective in creating a slippery surface for the robot to turn on. The workspace can be seen as a photograph and as a sketch below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab07/img/sharktown.png" alt="" />
+									<br>
+									<p>The PI control code was modified to read the ToF sensor (set to long mode) and transmit that value and the yaw estimated from the gyroscope over bluetooth. Several operations were also made into separate functions to clean up the main loop:</p>
+									<br>
+									<pre><code>
+void loop()
+{
+  t0 = micros();
+  counts_control++;
+  if (BT_connected) //start after bluetooth connection made
+  {
+    //SENSE
+    if( myICM.dataReady() )
+    {
+      //Yaw
+      myICM.getAGMT();                // The values are only updated when you call 'getAGMT'
+      gyro_z = myICM.gyrZ();  //z measurement from gyroscope (angular speed)
+      yaw_g = -(yaw_g-gyro_z*(float)dt/1000000);
+      yaw_m = get_mag_yaw();
+      //distance
+    }  
+    if(distanceSensor.checkForDataReady())
+    {  
+      distance = distanceSensor.getDistance(); //Get the result of the measurement from ToF sensor
+      distanceSensor.clearInterrupt();
+      Serial.println(distance);
+      byte rangeStatus = distanceSensor.getRangeStatus();
+    }
+    //ACT
+    PI_spin();
+  }
+  bluetooth_com();  //bluetooth communication
+  dt = (micros()-t0); //time to run through entire loop in us
+} //END LOOP
+									</code></pre>
+									<br>
+									<p>The robot was placed with its center at (305mm, 305mm) in the workspace and allowed to do a rotational scan. The angle calculated from the gyroscope and the distance readings are plotted in polar coordinates below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab07/img/one_rot_polar.png" alt="" />
+									<br>
+									<p>The shape of this plot matches pretty well what my intuition would have me expect which is drawn below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab07/img/intuition.png" alt="" />
+									<br>
+									<p>The data collected from two rotations is plotted below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab07/img/two_rot_polar.png" alt="" />
+									<br>
+									<p>The second rotation is pretty consistent with the first one, and the differences can be attributed to the fact that the robot doesn’t rotate perfectly around its axis and moves around a bit as it turns.</p>
+									<p>It can be seen that a lot of data is collected near the corner the robot is in. This map is also obviously imperfect as some of the walls look curved and most of the corners don’t show right angles.</p>
+									<p>By defining the robot origin as in between the right wheels which is about where the axis of rotation was, the location of the ToF sensor was determined to be at (80mm, 10mm) in the robot frame. From this, the transformation matrices were defined as follows where x<sub>R</sub> and y<sub>R</sub> represent the starting position of the robot in the workspace frame, and θ represents the yaw angle.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab07/img/trans.png" alt="" />
+									<br>
+									<p>The position of a sensor reading in the world frame can be determined with the following equation.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab07/img/eq.png" alt="" />
+									<br>
+									<p>This calculation was done with MATLAB code like shown here for one scan’s data:</p>
+									<br>
+									<pre><code>
+% scan at (12,10) [in]
+xR = 12*25.4;
+yR = 10*25.4;
+data = table2array(readtable('scan_1_1rot.csv'));
+
+t = (data(:,1)-data(1,1))*10^-6;    %time vector in seconds
+theta = -data(:,5)*pi/180;  % angle in rad
+gyro = data(:,4);   %gyroscope reading (dps)
+distance = data(:,6);
+x_1 = zeros(1, length(data));  % vector for x values
+y_1 = zeros(1, length(data));  % vector for y values
+for k=[1:length(data)]  % for each measurement
+    PS = [distance(k); 0; 1];
+    robot2world = [cos(theta(k)) -sin(theta(k)) xR;
+                   sin(theta(k))  cos(theta(k)) yR;
+                   0            0           1 ];
+    sensor2robot = [1 0 90
+                    0 1 35
+                    0 0 1 ];
+    PW = robot2world*sensor2robot*PS;
+    x_1(k) = PW(1);
+    y_1(k) = PW(2);
+end
+									</code></pre>
+									<br>
+									<p>By having the robot do a 360° scan starting at 5 different points in the workspace, the following scatterplot was obtained.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab07/img/map.png" alt="" />
+									<br>
+									<p>Guided by this scatterplot, lines were drawn for where the obstacles are expected to be:</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab07/img/map_lines.png" alt="" />
+									<br>
+									<p>If the readings had to be paired down to a fixed number I would average the measurements in each range of angle. This is a simple solution that would give a pretty good estimate of the reading around that angle.</p>
+									<p>The start and end points of these lines were copied into the code in the lab7b Jupyter notebook:</p>
+									<pre><code>
+# Start points for each line segment describing the map
+start_points = np.array([[0.026,  0.015],
+                         [1.117, -0.022],
+                         [1.121,  0.230],
+                         [1.470,  0.225],
+                         [1.490,  0.887],
+                         [0.790,  0.889],
+                         [0.759,  0.676],
+                         [0.601,  0.689],
+                         [0.589,  1.182],
+                         [0.075,  1.218]])
+
+# End points for each line segment describing the map
+end_points = np.array([[1.117, -0.022],
+                       [1.121,  0.230],
+                       [1.470,  0.225],
+                       [1.490,  0.887],
+                       [0.790,  0.889],
+                       [0.759,  0.676],
+                       [0.601,  0.689],
+                       [0.589,  1.182],
+                       [0.075,  1.218],
+                       [0.026,  0.015]])
+
+# Check if map described by start_points and end_points is valid
+if(not is_map_valid(start_points, end_points)):
+    raise Exception("The definitions of start_points and end_points are not valid. Please make sure the number of points are equal.")
+									</code></pre>
+									<br>
+									<p>When these points were used to visualize the map in the plotter, the following plot was obtained.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab07/img/plotter_map.png" alt="" />
+									<br>
+									<p>This map matches what is expected from the previous plot.</p>
+									<br>
                                     <button class="btn btn-dark" data-dismiss="modal">
                                         <i class="fas fa-times fa-fw"></i>
                                         Close Window
@@ -1901,10 +2146,20 @@ while 1: # infinite loop
                                     <div class="divider-custom">
                                         <div class="divider-custom-line"></div>
                                     </div>
-                                    <!-- Lab Modal - Image-->
-                                    <!--<img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="" />-->
-                                    <!-- Lab Modal - Text-->
                                     <p class="mb-5">Coming soon...</p>
+									
+									<p></p>
+									
+									<br>
+									<pre><code>
+
+									</code></pre>
+									<br>
+									
+									<br>
+									<img class="img-fluid mb-5" src="Lab09/img/_.png" alt="" />
+									<br>
+									
                                     <button class="btn btn-dark" data-dismiss="modal">
                                         <i class="fas fa-times fa-fw"></i>
                                         Close Window
@@ -1938,6 +2193,19 @@ while 1: # infinite loop
                                     <!--<img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="" />-->
                                     <!-- Lab Modal - Text-->
                                     <p class="mb-5">Coming soon...</p>
+									
+									<p></p>
+									
+									<br>
+									<pre><code>
+
+									</code></pre>
+									<br>
+									
+									<br>
+									<img class="img-fluid mb-5" src="Lab10/img/_.png" alt="" />
+									<br>
+									
                                     <button class="btn btn-dark" data-dismiss="modal">
                                         <i class="fas fa-times fa-fw"></i>
                                         Close Window
@@ -1971,6 +2239,19 @@ while 1: # infinite loop
                                     <!--<img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="" />-->
                                     <!-- Lab Modal - Text-->
                                     <p class="mb-5">Coming soon...</p>
+									
+									<p></p>
+									
+									<br>
+									<pre><code>
+
+									</code></pre>
+									<br>
+									
+									<br>
+									<img class="img-fluid mb-5" src="Lab11/img/_.png" alt="" />
+									<br>
+									
                                     <button class="btn btn-dark" data-dismiss="modal">
                                         <i class="fas fa-times fa-fw"></i>
                                         Close Window
@@ -2004,6 +2285,19 @@ while 1: # infinite loop
                                     <!--<img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="" />-->
                                     <!-- Lab Modal - Text-->
                                     <p class="mb-5">Coming soon...</p>
+									
+									<p></p>
+									
+									<br>
+									<pre><code>
+
+									</code></pre>
+									<br>
+									
+									<br>
+									<img class="img-fluid mb-5" src="Lab12/img/_.png" alt="" />
+									<br>
+									
                                     <button class="btn btn-dark" data-dismiss="modal">
                                         <i class="fas fa-times fa-fw"></i>
                                         Close Window
