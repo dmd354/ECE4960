@@ -1,0 +1,15 @@
+Good job! You have a good understanding of the Bayes filter. Very clean pseudo code and informative comments. 
+
+In your actual implementation, remove any unnecessary interim variables in every function to make your code more efficient.
+
+Don't forget to normalize the matrix (bel_bar and bel) when necessary to prevent arithmetic underflow. Check the "Implementation tips" section in the lab8 documentation.
+
+1. compute_control: You are one of the few students who thought about the shortest turn. :D Use the "normalize_angle" function for that. Also, double-check your equations. What are the units of measurement for delta_rot_1 and delta_rot_2?
+
+2. odom_motion_model: Looks good.
+
+3. prediction_step: You are almost there. The number of "for" loops doesn't seem quite right. You need to go over every possible previous and current state (Refer to the "Implementation tips" section in the lab8 documentation). In "loc.bel_bar = sum", you are overwriting a floating-point number to the 3D grid variable. Also, the prediction step does not require a specific state xt as input; The grid variable "loc.bel" is used to store the probabilities of each grid cell from the previous iteration of the Bayes filter.
+
+4. sensor_model: Looks good. Check the for loop syntax to make sure it goes over all "18" values.
+
+5. update_step: The matrix multiplication logic does not seem right; you are multiplying a matrix of size (18,) with a matrix of size (20,20,18). Refer to the Bayes Filter algorithm; it needs to update the probabilities of each grid cell index based on the sensor model (measurement likelihood).

@@ -131,7 +131,7 @@
                             <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
                                 <div class="portfolio-item-caption-content text-center text-white"></div>
                             </div>
-                            <p style="font-size:25px">Lab 08 (Localization: simulation)</p>
+                            <p style="font-size:25px">Lab 08 (Localization: sim)</p>
                         </div>
                     </div>
 					<!-- Lab 9-->
@@ -2108,15 +2108,145 @@ if(not is_map_valid(start_points, end_points)):
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
                                     <!-- Lab Modal - Title-->
-                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0 text-center" id="portfolioModal8Label">Lab 08</h2>
+                                    <h2 class="portfolio-modal-title text-dark text-uppercase mb-0 text-center" id="portfolioModal7Label">Lab 08</h2>
                                     <!-- Icon Divider-->
                                     <div class="divider-custom">
                                         <div class="divider-custom-line"></div>
                                     </div>
-                                    <!-- Lab Modal - Image-->
-                                    <!--<img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="" />-->
-                                    <!-- Lab Modal - Text-->
-                                    <p class="mb-5">Coming soon...</p>
+									<h3>Abstract</h3>
+									<br>
+									<p>In this lab, code was written to implement the Bayes filter in the simulation environment.</p>
+									<br>
+									<h3>Grid Localization using Bayes Filter</h3>
+									<br>
+									<p>Before any code was written for this lab, functions were imported from math with the line, <code>from math import atan2, pi, sqrt, hypot</code>.</p>
+									<p>The compute control function was written to find the three control inputs necessary to move from one pose to another. The x and y distances between the two poses were calculated. These were used to find the angle at which the translation occurred. From this angle the two rotations can be calculated via subtraction and normalization. The translation is calculated as the euclidean distance between the two poses with the <code>math.hypot()</code> function. The function is copied below.</p>
+									<br>
+									<pre><code>
+def compute_control(cur_pose, prev_pose):
+    """Given the current and previous odometry poses, this function extracts
+    the control information based on the odometry motion model.
+    Args:
+        cur_pose  ([Pose]): Current Pose
+        prev_pose ([Pose]): Previous Pose 
+    Returns:
+        [delta_rot_1]: Rotation 1  (degrees)
+        [delta_trans]: Translation (meters)
+        [delta_rot_2]: Rotation 2  (degrees)
+    """
+    x_dist = cur_pose[0]-prev_pose[0] # distance traveled in x direction [m]
+    y_dist = cur_pose[1]-prev_pose[1] # distance traveled in y direction [m]
+    trans_angle = atan2(y_dist, x_dist)*180/pi # angle at which translation happened [deg]
+    delta_rot_1 = mapper.normalize_angle(trans_angle-prev_pose[2]) # rotaion from start pose to translation angle
+    delta_trans = hypot(x_dist, y_dist) # euclidean distance
+    delta_rot_2 = mapper.normalize_angle(cur_pose[2]-trans_angle) # rotation from translation angle to final pose
+
+    return delta_rot_1, delta_trans, delta_rot_2
+									</code></pre>
+									<br>
+									<p>The odometry model computes the probability of a current pose given a previous pose and control input. It does this by backing out the ideal control input between the two poses with the compute_control function. A probability is calculated for the translation and two rotations by evaluating the gaussian function with the mean at the true input value and the standard deviation as the appropriate odometry sigma constant at the value calculated in the previous step. These probabilities are then multiplied together and returned. This was initially done in separate steps, but to reduce the computation time, the probabilities were all combined into one line. The function is copied below.</p>
+									<br>
+									<pre><code>
+def odom_motion_model(cur_pose, prev_pose, u):
+    """ Odometry Motion Model
+    Args:
+        cur_pose  ([Pose]): Current Pose
+        prev_pose ([Pose]): Previous Pose
+        u (rot1, trans, rot2) (float, float, float): A tuple with control data in the format format (rot1, trans, rot2) with units (degrees, meters, degrees)                                               
+    Returns:
+        prob [float]: Probability p(x'|x, u)
+    """
+    # called Transition Probability / Action Model in lecture notes
+    
+    # find the movement between previous and current timestep
+    movement = compute_control(cur_pose, prev_pose)
+    
+    # easier to understand implimentation:
+    #P_rot_1 = loc.gaussian(movement[0], u[0], loc.odom_rot_sigma) # probability of rotation 1 given control
+    #P_trans = loc.gaussian(movement[1], u[1], loc.odom_trans_sigma) # probability of translation given control
+    #P_rot_2 = loc.gaussian(movement[2], u[2], loc.odom_rot_sigma) # probability of rotation 2 given control
+    #prob = P_rot_1*P_trans*P_rot_2 # assume independent probabilities
+    
+    # faster implimentaion:
+    prob = loc.gaussian(movement[0], u[0], loc.odom_rot_sigma) * loc.gaussian(movement[1], u[1], loc.odom_trans_sigma) * loc.gaussian(movement[2], u[2], loc.odom_rot_sigma)
+    return prob
+									</code></pre>
+									<br>
+									<p>The prediction step function initially ran through all of the previous and current states, to sum the bel_bar variable, and this function took about 1.5 hours to finish running. An if statement was added that made it so values were only added if the belief of the previous state was large enough to consider. This reduced the runtime to a few seconds. The function is copied below.</p>
+									<br>
+									<pre><code>
+def prediction_step(cur_odom, prev_odom):
+    """ Prediction step of the Bayes Filter.
+    Update the probabilities in loc.bel_bar based on loc.bel from the previous time step and the odometry motion model.
+
+    Args:
+        cur_odom  ([Pose]): Current Pose
+        prev_odom ([Pose]): Previous Pose
+    """
+    u = compute_control(cur_odom, prev_odom)
+    # for all previous state indices
+    for xp in range(0, mapper.MAX_CELLS_X):
+        # print(xp) # line to wath progress of update step
+        for yp in range(0, mapper.MAX_CELLS_Y):
+            for ap in range(0, mapper.MAX_CELLS_A):
+                if loc.bel[xp, yp, ap]>0.0001:   #  only run through current states if previous beliefs are not negligable
+                    # for all current state indices
+                    for xc in range(0, mapper.MAX_CELLS_X): 
+                        for yc in range(0, mapper.MAX_CELLS_Y):
+                            for ac in range(0, mapper.MAX_CELLS_A):
+                                loc.bel_bar[xc, yc, ac] = loc.bel_bar[xc, yc, ac] + odom_motion_model(mapper.from_map(xc, yc, ac), mapper.from_map(xp, yp, ap), u) * loc.bel[xp, yp, ap]
+									</code></pre>
+									<br>
+									<p>Some test code was written to get familiar with how NumPy array variables could be used in the gaussian function:</p>
+									<br>
+									<pre><code>
+means = np.array([1, 2, 3])
+sigma = 0.5
+vals = np.array([1.1, 2, 4])
+loc.gaussian(vals, means, sigma)
+									</code></pre>
+									<br>
+									<p>The above code returned <code>array([0.98019867, 1.  , 0.13533528])</code> which matched what was expected.</p>
+									<p>To save on computation time, I decided to not use a sensor model function, and instead just calculate p(z|x) directly in the update step. The update step loops through the indices of every state, and if the predicted belief value at that index is large enough to consider, the belief of that state was updated with the sensor model. The senor model was calculated by giving the gaussian function the numpy array of the cached views as the mean (expected values from that state), the sensor sigma as the standard deviation, and the observed range data as the points to evaluate the gaussian at. The gaussian returns an array of the probability of each measurement which were all multiplied together assuming independence with the NumPy prod function. The belief was normalized after every update to avoid underflow. The update step function is copied below.</p>
+									<br>
+									<pre><code>
+def update_step():
+    """ Update step of the Bayes Filter.
+    Update the probabilities in loc.bel based on loc.bel_bar and the sensor model.
+    """
+    # for all states
+    for x in range(0, mapper.MAX_CELLS_X):
+        for y in range(0, mapper.MAX_CELLS_Y):
+            for a in range(0, mapper.MAX_CELLS_A):
+                if loc.bel_bar[x, y, a]>0.0001:
+                    loc.bel[x, y, a] = np.prod(loc.gaussian(loc.obs_range_data, mapper.obs_views[x, y, a, :], loc.sensor_sigma)) * loc.bel_bar[x, y, a]
+                    loc.bel = loc.bel / np.sum(loc.bel) # normalize belief grid
+									</code></pre>
+									<br>
+									<p>When the functions were run with the given Bayes Filter implementation code, the following plot was obtained.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab08/img/bayes1.png" alt="" />
+									<br>
+									<p>The filter does a pretty good job of estimating the state of the robot; the belief remains very close to the ground truth after the first few timesteps.</p>
+									<p>If the odometry output is also shown on the plot, it is obvious how dramatic of an improvement the filter makes:</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab08/img/bayes1_odom.png" alt="" />
+									<br>
+									<p>To check for consistency, the same exact code was run a second time to get the following plot.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab08/img/bayes2.png" alt="" />
+									<br>
+									<p>This run did a good job of estimating the position as well. The updated belief data associated with this run is tabulated below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab08/img/table.png" alt="" />
+									<br>
+									<p>The position error is pretty large for the first few measurements, but then shrinks down and stays within (±0.2, ±0.2, ±20) which is as good as the filter can be expected to do given the precision of the grid used. The filter works best after several timesteps and when the ground truth position of the robot is near the center of the grid blocks.The accuracy of the filter could be increased if a more precise grid was used, but this would also dramatically increase processing time. </p>
+									<p>The Bayes Filter can be seen in action in the following video. The full trajectory takes about 7 minutes to run so it is recommended to watch the video at 2x speed.</p>
+									<br>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/FFgRFw4Gc_s" allowfullscreen></iframe>
+									</div>
+									<br>
                                     <button class="btn btn-dark" data-dismiss="modal">
                                         <i class="fas fa-times fa-fw"></i>
                                         Close Window

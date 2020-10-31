@@ -1,0 +1,545 @@
+----------------- 0 -----------------
+ | Resetting Robot pose
+
+---------- PREDICTION STATS -----------
+GT index            :  (11, 9, 7)
+Prior Bel index     :  (13, 10, 8) with prob =  0.8824897
+POS ERROR      : (-0.311, -0.195, -12.345)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (11, 9, 8)
+Bel index     :  (10, 10, 7) with prob =  0.9999999
+Bel_bar prob at index =  0.034925429684510435
+
+GT     : (0.389, -0.095, -19.345)
+Belief   : (0.100, 0.100, -30.000)
+POS ERROR : (0.289, -0.195, 10.655)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 1 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (13, 7, 8)
+Prior Bel index     :  (13, 10, 8) with prob =  0.8840668
+POS ERROR      : (-0.010, -0.529, 7.843)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (13, 7, 8)
+Bel index     :  (12, 7, 8) with prob =  0.9047675
+Bel_bar prob at index =  0.040556540989169776
+
+GT     : (0.690, -0.429, -2.157)
+Belief   : (0.500, -0.500, -10.000)
+POS ERROR : (0.190, 0.071, 7.843)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 2 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (14, 7, 9)
+Prior Bel index     :  (13, 10, 8) with prob =  0.8840668
+POS ERROR      : (0.289, -0.541, 14.031)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (14, 7, 9)
+Bel index     :  (13, 5, 8) with prob =  0.9964256
+Bel_bar prob at index =  0.00157985248179705
+
+GT     : (0.989, -0.441, 4.031)
+Belief   : (0.700, -0.900, -10.000)
+POS ERROR : (0.289, 0.459, 14.031)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 3 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (16, 7, 11)
+Prior Bel index     :  (13, 10, 8) with prob =  0.8840668
+POS ERROR      : (0.649, -0.515, 51.847)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (16, 7, 11)
+Bel index     :  (15, 6, 10) with prob =  0.9999999
+Bel_bar prob at index =  0.013943257866998694
+
+GT     : (1.349, -0.415, 44.847)
+Belief   : (1.100, -0.700, 30.000)
+POS ERROR : (0.249, 0.285, 14.847)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 4 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (17, 9, 14)
+Prior Bel index     :  (13, 10, 8) with prob =  0.8840668
+POS ERROR      : (0.850, -0.294, 115.007)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (17, 9, 14)
+Bel index     :  (14, 5, 11) with prob =  0.9680224
+Bel_bar prob at index =  0.3274317849961688
+
+GT     : (1.550, -0.194, 108.007)
+Belief   : (0.900, -0.900, 50.000)
+POS ERROR : (0.650, 0.706, 58.007)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 5 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (16, 11, 14)
+Prior Bel index     :  (16, 7, 10) with prob =  0.8935449
+POS ERROR      : (0.096, 0.782, 78.007)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (16, 11, 14)
+Bel index     :  (16, 11, 14) with prob =  1.0
+Bel_bar prob at index =  0.0001582108607204174
+
+GT     : (1.396, 0.282, 108.007)
+Belief   : (1.300, 0.300, 110.000)
+POS ERROR : (0.096, -0.018, -1.993)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 6 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (16, 13, 14)
+Prior Bel index     :  (16, 7, 10) with prob =  0.8935449
+POS ERROR      : (0.027, 1.196, 86.601)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (16, 13, 14)
+Bel index     :  (15, 14, 15) with prob =  0.8867126
+Bel_bar prob at index =  0.7149305361342201
+
+GT     : (1.327, 0.696, 116.601)
+Belief   : (1.100, 0.900, 130.000)
+POS ERROR : (0.227, -0.204, -13.399)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 7 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (16, 15, 14)
+Prior Bel index     :  (16, 7, 10) with prob =  0.8935449
+POS ERROR      : (-0.051, 1.670, 86.601)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (16, 15, 14)
+Bel index     :  (16, 15, 14) with prob =  0.6718250
+Bel_bar prob at index =  0.5258446864841527
+
+GT     : (1.249, 1.170, 119.601)
+Belief   : (1.300, 1.100, 110.000)
+POS ERROR : (-0.051, 0.070, 9.601)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 8 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (16, 15, 17)
+Prior Bel index     :  (16, 7, 10) with prob =  0.8935449
+POS ERROR      : (-0.051, 1.670, 146.897)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (16, 15, 17)
+Bel index     :  (16, 14, 17) with prob =  0.9999233
+Bel_bar prob at index =  0.00046690617632580807
+
+GT     : (1.249, 1.170, 176.897)
+Belief   : (1.300, 0.900, 170.000)
+POS ERROR : (-0.051, 0.270, 6.897)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 9 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (14, 15, 17)
+Prior Bel index     :  (14, 15, 16) with prob =  1.0899946
+POS ERROR      : (0.049, 0.086, 28.043)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (14, 15, 0)
+Bel index     :  (15, 15, 17) with prob =  0.9999992
+Bel_bar prob at index =  0.1112433719069567
+
+GT     : (0.949, 1.186, -178.957)
+Belief   : (1.100, 1.100, 170.000)
+POS ERROR : (-0.151, 0.086, -348.957)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 10 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (13, 15, 17)
+Prior Bel index     :  (13, 16, 16) with prob =  1.5213304
+POS ERROR      : (-0.081, -0.120, 27.605)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (13, 15, 17)
+Bel index     :  (13, 16, 17) with prob =  0.9999999
+Bel_bar prob at index =  1.0673063571245636
+
+GT     : (0.619, 1.180, 177.605)
+Belief   : (0.700, 1.300, 170.000)
+POS ERROR : (-0.081, -0.120, 7.605)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 11 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (12, 16, 17)
+Prior Bel index     :  (13, 16, 16) with prob =  1.5213304
+POS ERROR      : (-0.279, -0.092, 21.876)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (12, 16, 17)
+Bel index     :  (12, 15, 17) with prob =  0.9743990
+Bel_bar prob at index =  0.5098113047964872
+
+GT     : (0.421, 1.208, 171.876)
+Belief   : (0.500, 1.100, 170.000)
+POS ERROR : (-0.079, 0.108, 1.876)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 12 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (9, 16, 17)
+Prior Bel index     :  (13, 16, 16) with prob =  1.5213304
+POS ERROR      : (-0.724, -0.028, 21.876)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (9, 16, 17)
+Bel index     :  (9, 17, 17) with prob =  0.9999999
+Bel_bar prob at index =  0.2561338607196399
+
+GT     : (-0.024, 1.272, 174.876)
+Belief   : (-0.100, 1.500, 170.000)
+POS ERROR : (0.076, -0.228, 4.876)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 13 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (9, 16, 0)
+Prior Bel index     :  (13, 16, 16) with prob =  1.5213304
+POS ERROR      : (-0.774, -0.024, -329.395)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (9, 16, 0)
+Bel index     :  (9, 16, 17) with prob =  0.9688562
+Bel_bar prob at index =  0.6182342431090809
+
+GT     : (-0.074, 1.276, -179.395)
+Belief   : (-0.100, 1.300, 170.000)
+POS ERROR : (0.026, -0.024, -349.395)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 14 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (7, 16, 0)
+Prior Bel index     :  (13, 16, 16) with prob =  1.5213304
+POS ERROR      : (-1.224, -0.028, -329.395)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (7, 16, 0)
+Bel index     :  (9, 15, 17) with prob =  0.9999998
+Bel_bar prob at index =  0.7647899018726594
+
+GT     : (-0.524, 1.272, -176.395)
+Belief   : (-0.100, 1.100, 170.000)
+POS ERROR : (-0.424, 0.172, -346.395)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 15 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (7, 16, 3)
+Prior Bel index     :  (13, 16, 16) with prob =  1.5213304
+POS ERROR      : (-1.224, -0.028, -255.348)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (7, 16, 3)
+Bel index     :  (6, 16, 3) with prob =  0.7144384
+Bel_bar prob at index =  0.08911710941421751
+
+GT     : (-0.524, 1.272, -102.348)
+Belief   : (-0.700, 1.300, -110.000)
+POS ERROR : (0.176, -0.028, 7.652)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 16 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (7, 15, 4)
+Prior Bel index     :  (13, 16, 16) with prob =  1.5213304
+POS ERROR      : (-1.227, -0.228, -240.889)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (7, 15, 4)
+Bel index     :  (6, 15, 4) with prob =  0.9847540
+Bel_bar prob at index =  0.6828233369823302
+
+GT     : (-0.527, 1.072, -90.889)
+Belief   : (-0.700, 1.100, -90.000)
+POS ERROR : (0.173, -0.028, -0.889)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 17 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (7, 14, 4)
+Prior Bel index     :  (13, 16, 16) with prob =  1.5213304
+POS ERROR      : (-1.220, -0.428, -238.024)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (7, 14, 4)
+Bel index     :  (6, 13, 4) with prob =  1.0
+Bel_bar prob at index =  1.015236838875201
+
+GT     : (-0.520, 0.872, -88.024)
+Belief   : (-0.700, 0.700, -90.000)
+POS ERROR : (0.180, 0.172, 1.976)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 18 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (7, 12, 4)
+Prior Bel index     :  (13, 16, 16) with prob =  1.5213304
+POS ERROR      : (-1.210, -0.728, -239.170)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (7, 12, 4)
+Bel index     :  (6, 12, 4) with prob =  0.8747268
+Bel_bar prob at index =  1.2755202440288311
+
+GT     : (-0.510, 0.572, -89.170)
+Belief   : (-0.700, 0.500, -90.000)
+POS ERROR : (0.190, 0.072, 0.830)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 19 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (7, 11, 4)
+Prior Bel index     :  (6, 11, 4) with prob =  1.6119001
+POS ERROR      : (0.194, -0.028, -0.316)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (7, 11, 4)
+Bel index     :  (6, 10, 4) with prob =  1.0
+Bel_bar prob at index =  1.2203320649884972
+
+GT     : (-0.506, 0.272, -90.316)
+Belief   : (-0.700, 0.100, -90.000)
+POS ERROR : (0.194, 0.172, -0.316)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 20 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (7, 10, 5)
+Prior Bel index     :  (6, 11, 4) with prob =  1.6119001
+POS ERROR      : (0.203, -0.128, 10.571)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (7, 10, 5)
+Bel index     :  (6, 10, 5) with prob =  0.9966226
+Bel_bar prob at index =  0.3630680013716276
+
+GT     : (-0.497, 0.172, -76.429)
+Belief   : (-0.700, 0.100, -70.000)
+POS ERROR : (0.203, 0.072, -6.429)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 21 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (7, 9, 5)
+Prior Bel index     :  (6, 11, 4) with prob =  1.6119001
+POS ERROR      : (0.273, -0.419, 13.571)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (7, 9, 5)
+Bel index     :  (8, 8, 5) with prob =  0.9999999
+Bel_bar prob at index =  0.47491871289256044
+
+GT     : (-0.427, -0.119, -76.429)
+Belief   : (-0.300, -0.300, -70.000)
+POS ERROR : (-0.127, 0.181, -6.429)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 22 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (8, 7, 6)
+Prior Bel index     :  (6, 11, 4) with prob =  1.6119001
+POS ERROR      : (0.478, -0.763, 47.948)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (8, 7, 6)
+Bel index     :  (8, 7, 6) with prob =  0.9787523
+Bel_bar prob at index =  0.37800654596195793
+
+GT     : (-0.222, -0.463, -42.052)
+Belief   : (-0.300, -0.500, -50.000)
+POS ERROR : (0.078, 0.037, 7.948)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 23 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (9, 7, 9)
+Prior Bel index     :  (6, 11, 4) with prob =  1.6119001
+POS ERROR      : (0.677, -0.750, 105.244)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (9, 7, 9)
+Bel index     :  (9, 7, 9) with prob =  1.0
+Bel_bar prob at index =  0.019459892422931186
+
+GT     : (-0.023, -0.450, 15.244)
+Belief   : (-0.100, -0.500, 10.000)
+POS ERROR : (0.077, 0.050, 5.244)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 24 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (10, 8, 10)
+Prior Bel index     :  (6, 11, 4) with prob =  1.6119001
+POS ERROR      : (0.858, -0.576, 128.162)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (10, 8, 10)
+Bel index     :  (8, 8, 2) with prob =  0.9999999
+Bel_bar prob at index =  0.007705453942888315
+
+GT     : (0.158, -0.276, 38.162)
+Belief   : (-0.300, -0.300, -130.000)
+POS ERROR : (0.458, 0.024, 168.162)
+---------- UPDATE STATS -----------
+-------------------------------------
+
+
+----------------- 25 -----------------
+
+---------- PREDICTION STATS -----------
+GT index            :  (11, 9, 11)
+Prior Bel index     :  (6, 11, 4) with prob =  1.6119001
+POS ERROR      : (0.956, -0.347, 139.621)
+---------- PREDICTION STATS -----------
+ | Executing Observation Loop at: 30 deg/s
+
+---------- UPDATE STATS -----------
+GT index      :  (11, 9, 11)
+Bel index     :  (10, 10, 11) with prob =  0.9680456
+Bel_bar prob at index =  0.6882491710398975
+
+GT     : (0.256, -0.047, 52.621)
+Belief   : (0.100, 0.100, 50.000)
+POS ERROR : (0.156, -0.147, 2.621)
+---------- UPDATE STATS -----------
+-------------------------------------
