@@ -100,20 +100,30 @@ unsigned char R_motor_val=0;  //value to send to right motor
 unsigned int counts_control=0;
 unsigned int counts_data=0;
 bool BT_connected=false;
-unsigned int setpoint=50;
+unsigned int setpoint=30;
 float error;
 float error_prior = 0;
 float integral = 0;
 float integral_prior = 0;
 float u;
 int distance;
+unsigned int t_start_spin; //used for timing spin
+unsigned int t_spin;
+bool spinning=0;  //set when spinning
+bool got_start_time;
+
+
 
 /*************************************************************************************************/
 /*!
      \fn     setup
+
      \brief  Arduino setup function.  Set up the board BLE and GPIO - BLE first...
+
      \param  none
+
      \called Arduino startup
+
      \return None.
  */
 /*************************************************************************************************/
@@ -169,6 +179,7 @@ void setup()
           - SMP - Low Energy security
           - APP - application handlers..global settings..etc
           - NUS - nordic location services
+
      ************************************************************************************************/
     exactle_stack_init();
 
@@ -182,6 +193,7 @@ void setup()
 
     /*************************************************************************************************
         Start the "Amdtp" (AmbiqMicro Data Transfer Protocol) profile. Function in amdtp_main.c
+
          Register for stack callbacks
          - Register callback with DM for scan and advertising events with security
          - Register callback with Connection Manager with client id
@@ -191,6 +203,7 @@ void setup()
          - Register for app framework discovery callbacks
          - Initialize attribute server database
          - Reset the device
+
      ************************************************************************************************/
     AmdtpStart();
 
@@ -400,6 +413,8 @@ void setup()
   Serial.println(F("Configuration complete!")); 
 
   distanceSensor.setDistanceModeLong();
+
+  
 } /*** END setup FCN ***/
 
 
@@ -413,27 +428,15 @@ void loop()
 {
   t0 = micros();
   counts_control++;
+  
   if (BT_connected) //start after bluetooth connection made
   {
-    //SENSE
-    if( myICM.dataReady() )
-    {
-      //Yaw
-      myICM.getAGMT();                // The values are only updated when you call 'getAGMT'
-      gyro_z = myICM.gyrZ();  //z measurement from gyroscope (angular speed)
-      yaw_g = -(yaw_g-gyro_z*(float)dt/1000000);
-      yaw_m = get_mag_yaw();
-      //disance
-    }  
-    if(distanceSensor.checkForDataReady())
-    {  
-      distance = distanceSensor.getDistance(); //Get the result of the measurement from ToF sensor
-      distanceSensor.clearInterrupt();
-      Serial.println(distance);
-      byte rangeStatus = distanceSensor.getRangeStatus();
-    }
-    //ACT
-    PI_spin();
+	Serial.print("BT connected");
+    rotational_scan();
+	while(1)
+	{
+	    bluetooth_com();  //bluetooth communication
+	}
   }
   bluetooth_com();  //bluetooth communication
   dt = (micros()-t0); //time to run through entire loop in us
@@ -446,7 +449,7 @@ void loop()
 
 
 
-float get_mag_yaw(void)
+/*float get_mag_yaw(void)
 {
   xm = myICM.magX()*cos(pitch*M_PI/180)-myICM.magY()*sin(roll*M_PI/180)*sin(pitch)+myICM.magZ()*cos(roll*M_PI/180)*sin(pitch*M_PI/180); //these were saying theta=pitch and roll=phi
   ym = myICM.magY()*cos(roll*M_PI/180) + myICM.magZ()*sin(roll*M_PI/180);
@@ -455,7 +458,7 @@ float get_mag_yaw(void)
   //Serial.print(ym);
   //Serial.print("\n");
   return atan2(ym, xm)*180/M_PI;
-}
+}*/
 
 void PI_spin(void)
 {
@@ -504,11 +507,69 @@ void PI_spin(void)
   }
 }
 
+void rotational_scan(void)
+{
+  //function that perfroms one rotation while reading sensor values
+  integral = 0; //clear integral to prevent windup
+  t_spin=0;	//clear spinning time
+  got_start_time=0;	//clar start time flag
+  while(t_spin<14300000)  //until complete rotation is done (12 seconds)
+  {
+	t0 = micros();
+	if(gyro_z>15)	// are we spinning yet?
+	{
+	  spinning = 1;
+	}
+    //SENSE
+    update_sensor_readings();
+    //ACT
+    PI_spin();
+	if(spinning)
+	{
+      if(!got_start_time) //if the start time wasnt already set
+	  {
+	    t_start_spin = micros();	//set sstart time
+		got_start_time = 1;			//set flag so start time stays constant
+      }
+	  t_spin = micros()-t_start_spin;	//update time spent spinning
+	}
+	bluetooth_com();  //bluetooth communication
+    dt = (micros()-t0); //time to run through entire loop in us
+  }
+  //stop
+  myMotorDriver.setDrive( L_MOTOR, FWD, 0); 
+  myMotorDriver.setDrive( R_MOTOR, REV, 0);
+  spinning=0;
+}
+
+void update_sensor_readings(void)
+{
+  //function that takes sesnor readings and updates associaed values
+  if( myICM.dataReady() )
+    {
+      //Yaw
+      myICM.getAGMT();                // The values are only updated when you call 'getAGMT'
+      gyro_z = myICM.gyrZ();  //z measurement from gyroscope (angular speed)
+      yaw_g = -(yaw_g-gyro_z*(float)dt/1000000);
+      //yaw_m = get_mag_yaw();
+      //disance
+    }  
+    if(distanceSensor.checkForDataReady())
+    {  
+      distance = distanceSensor.getDistance(); //Get the result of the measurement from ToF sensor
+      distanceSensor.clearInterrupt();
+      Serial.println(distance);
+      byte rangeStatus = distanceSensor.getRangeStatus();
+    }
+}
+
+
+
 void bluetooth_com(void)
 {
   //function does all bluetooth communication
   //Serial.println("Loop...."); //KHE Loops constantly....no delays
-  //--------------------------------------BLUETOOTH-----------------------------------------------------------
+  //--------------------------------------BLUETOOTH---------------------------------------------------------------------------------------------------------------------------------
   counts_data++;
   if (l_Rcvd > 1) //Check if we have a new message from amdtps_main.c through BLE_example_funcs.cpp
   {
@@ -520,6 +581,7 @@ void bluetooth_com(void)
           Serial.printf("%d ", m_Rcvd[i]);
       Serial.println();
       Serial.printf("Got command: 0x%x Length: 0x%x Data: ", cmd->command_type, cmd->length);
+
       for (int i = 0; i < cmd->length; i++)
       {
           Serial.printf("0x%x ", cmd->data[i]);
@@ -600,7 +662,9 @@ void bluetooth_com(void)
 
   if (bytestream_active)
   {
-      BT_connected=true;
+	BT_connected=true;
+	if(spinning)
+	{		
       res_cmd->command_type = BYTESTREAM_TX;  //set command type to bytestream transmit
       res_cmd->length = 14;                    //length doesn't matter since the handler will take care of this
       //TODO: Put an example of a 32-bit integer and a 64-bit integer
@@ -618,7 +682,7 @@ void bluetooth_com(void)
       memcpy(res_cmd->data+14, &distance, 4);    
       amdtpsSendData((uint8_t *)res_cmd, 20);  //2 bytes for type and length, 18 bytes of data
       counts_data=0;
-
+	}
   }
 
   trigger_timers();

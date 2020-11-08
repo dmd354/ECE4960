@@ -107,13 +107,21 @@ float integral = 0;
 float integral_prior = 0;
 float u;
 int distance;
+unsigned int t_start_spin; //used for timing spin
+bool spinning;  //set when spinning
+
+
 
 /*************************************************************************************************/
 /*!
      \fn     setup
+
      \brief  Arduino setup function.  Set up the board BLE and GPIO - BLE first...
+
      \param  none
+
      \called Arduino startup
+
      \return None.
  */
 /*************************************************************************************************/
@@ -169,6 +177,7 @@ void setup()
           - SMP - Low Energy security
           - APP - application handlers..global settings..etc
           - NUS - nordic location services
+
      ************************************************************************************************/
     exactle_stack_init();
 
@@ -182,6 +191,7 @@ void setup()
 
     /*************************************************************************************************
         Start the "Amdtp" (AmbiqMicro Data Transfer Protocol) profile. Function in amdtp_main.c
+
          Register for stack callbacks
          - Register callback with DM for scan and advertising events with security
          - Register callback with Connection Manager with client id
@@ -191,6 +201,7 @@ void setup()
          - Register for app framework discovery callbacks
          - Initialize attribute server database
          - Reset the device
+
      ************************************************************************************************/
     AmdtpStart();
 
@@ -400,6 +411,12 @@ void setup()
   Serial.println(F("Configuration complete!")); 
 
   distanceSensor.setDistanceModeLong();
+
+  //initialize odometry pose
+  pose_x=0;
+  pose_y=0;
+  pose_theta=0;
+  
 } /*** END setup FCN ***/
 
 
@@ -413,27 +430,10 @@ void loop()
 {
   t0 = micros();
   counts_control++;
+  
   if (BT_connected) //start after bluetooth connection made
   {
-    //SENSE
-    if( myICM.dataReady() )
-    {
-      //Yaw
-      myICM.getAGMT();                // The values are only updated when you call 'getAGMT'
-      gyro_z = myICM.gyrZ();  //z measurement from gyroscope (angular speed)
-      yaw_g = -(yaw_g-gyro_z*(float)dt/1000000);
-      yaw_m = get_mag_yaw();
-      //disance
-    }  
-    if(distanceSensor.checkForDataReady())
-    {  
-      distance = distanceSensor.getDistance(); //Get the result of the measurement from ToF sensor
-      distanceSensor.clearInterrupt();
-      Serial.println(distance);
-      byte rangeStatus = distanceSensor.getRangeStatus();
-    }
-    //ACT
-    PI_spin();
+    rotational_scan();
   }
   bluetooth_com();  //bluetooth communication
   dt = (micros()-t0); //time to run through entire loop in us
@@ -445,7 +445,7 @@ void loop()
 
 
 
-
+/*
 float get_mag_yaw(void)
 {
   xm = myICM.magX()*cos(pitch*M_PI/180)-myICM.magY()*sin(roll*M_PI/180)*sin(pitch)+myICM.magZ()*cos(roll*M_PI/180)*sin(pitch*M_PI/180); //these were saying theta=pitch and roll=phi
@@ -455,7 +455,7 @@ float get_mag_yaw(void)
   //Serial.print(ym);
   //Serial.print("\n");
   return atan2(ym, xm)*180/M_PI;
-}
+}*/
 
 void PI_spin(void)
 {
@@ -504,11 +504,55 @@ void PI_spin(void)
   }
 }
 
+void rotational_scan(void)
+{
+  t0 = micros();
+  //function that perfroms one rotation while reading sensor values
+  float start_yaw = yaw_g;
+  integral = 0; //clear integral to prevent windup
+  while(yaw_g<start_yaw+360)  //until complete rotation is done
+  {
+    // funcitonn that had the robot do a rotaitonal scan
+    //SENSE
+    update_sensor_readings();
+    //ACT
+    PI_spin();
+    bluetooth_com();  //bluetooth communication
+    dt = (micros()-t0); //time to run through entire loop in us
+  }
+  //stop
+  myMotorDriver.setDrive( L_MOTOR, FWD, 0); 
+  myMotorDriver.setDrive( R_MOTOR, REV, 0);
+}
+
+void update_sensor_readings(void)
+{
+  //function that takes sesnor readings and updates associaed values
+  if( myICM.dataReady() )
+    {
+      //Yaw
+      myICM.getAGMT();                // The values are only updated when you call 'getAGMT'
+      gyro_z = myICM.gyrZ();  //z measurement from gyroscope (angular speed)
+      yaw_g = -(yaw_g-gyro_z*(float)dt/1000000);
+      //yaw_m = get_mag_yaw();
+      //disance
+    }  
+    if(distanceSensor.checkForDataReady())
+    {  
+      distance = distanceSensor.getDistance(); //Get the result of the measurement from ToF sensor
+      distanceSensor.clearInterrupt();
+      Serial.println(distance);
+      byte rangeStatus = distanceSensor.getRangeStatus();
+    }
+}
+
+
+
 void bluetooth_com(void)
 {
   //function does all bluetooth communication
   //Serial.println("Loop...."); //KHE Loops constantly....no delays
-  //--------------------------------------BLUETOOTH-----------------------------------------------------------
+  //--------------------------------------BLUETOOTH---------------------------------------------------------------------------------------------------------------------------------
   counts_data++;
   if (l_Rcvd > 1) //Check if we have a new message from amdtps_main.c through BLE_example_funcs.cpp
   {
@@ -520,6 +564,7 @@ void bluetooth_com(void)
           Serial.printf("%d ", m_Rcvd[i]);
       Serial.println();
       Serial.printf("Got command: 0x%x Length: 0x%x Data: ", cmd->command_type, cmd->length);
+
       for (int i = 0; i < cmd->length; i++)
       {
           Serial.printf("0x%x ", cmd->data[i]);
