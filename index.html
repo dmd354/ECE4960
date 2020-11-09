@@ -2280,7 +2280,7 @@ def update_step():
 									<br>
 									<p>In this lab, localization was attempted on the physical robot in the workspace created in Lab 7.</p>
 									<br>
-									<p>Localization</p>
+									<h3>Offline Localization</h3>
 									<br>
 									<p>When the code in the provided lab9_sim.ipynb was run, the following plot was obtained.</p>
 									<br>
@@ -2309,7 +2309,7 @@ void rotational_scan(void)
     PI_spin();
 	if(spinning)
 	{
-      if(!got_start_time) //if the start time wasn't already set
+	  if(!got_start_time) //if the start time wasn't already set
 	  {
 	    t_start_spin = micros();	//set start time
 		got_start_time = 1;			//set flag so start time stays constant
@@ -2322,7 +2322,9 @@ void rotational_scan(void)
   //stop
   myMotorDriver.setDrive( L_MOTOR, FWD, 0); 
   myMotorDriver.setDrive( R_MOTOR, REV, 0);
-  spinning=0;
+  
+  spinning=0;	//clear spinnng flag
+  got_start_time = 1;	//clear start time flag
 }
 
 									</code></pre>
@@ -2446,7 +2448,8 @@ async def get_pose(self):
 init_bayes_filter()
 
 #plot true position and belief
-loc.plotter.plot_point(12*0.0254, 12*0.0254, GT)
+truth = robot.get_gt_pose()
+loc.plotter.plot_point(truth[0], truth[1], GT)
 loc.plotter.visualize_bel()
 									</code></pre>
 									<br>

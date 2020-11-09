@@ -539,7 +539,9 @@ void rotational_scan(void)
   //stop
   myMotorDriver.setDrive( L_MOTOR, FWD, 0); 
   myMotorDriver.setDrive( R_MOTOR, REV, 0);
-  spinning=0;
+  
+  spinning=0;	//clear spinnng flag
+  got_start_time = 1;	//clear start time flag
 }
 
 void update_sensor_readings(void)
