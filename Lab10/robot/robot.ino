@@ -28,6 +28,7 @@ uint8_t *val_len = &val[1];  // store length of optional data
 #include "SparkFun_VCNL4040_Arduino_Library.h"
 #include "ICM_20948.h"  // Click here to get the library: http://librarymanager/All#SparkFun_ICM_20948_IMU
 #include "math.h"
+#include <stdlib.h>
 
 /********************************************************************************************************************
                   OBJECTS
@@ -111,6 +112,12 @@ unsigned int t_start_spin; //used for timing spin
 bool spinning;  //set when spinning
 char in_range_counts;
 float turned;
+bool time_to_roll=0;
+bool time_to_turn=0;
+int cmd_val;
+int msg;
+unsigned int t_start;
+unsigned int t_run;
 
 
 
@@ -426,7 +433,23 @@ void setup()
 //---------------------------------------------------------------LOOP---------------------------------------------------------------------------------
 void loop()
 {
-  bluetooth_com();  //bluetooth communication
+	if(time_to_roll)
+	{
+		Serial.print("Lets roll ");
+		Serial.println(cmd_val);
+		PI_roll(cmd_val);
+		printOverBluetooth("Done rolling");
+		time_to_roll=0;
+	}
+	if(time_to_turn)
+	{
+		Serial.print("Lets turn ");
+		Serial.println(cmd_val);
+		PI_turn(cmd_val);
+		printOverBluetooth("Done turning");
+		time_to_turn=0;
+	}
+	bluetooth_com();  //bluetooth communication
 }
 //---------------------------------------------------------------LOOP---------------------------------------------------------------------------------
 
@@ -500,9 +523,12 @@ void PI_roll(int d)
 	dist_d = distance-d;	//desired distance from wall
 	error = d;
 	in_range_counts=0; //clear number of measurements where error is low
-	while(in_range_counts<1)
+	t_start = micros();
+	t_run = 0;
+	while(t_run<4000000 && in_range_counts<1) //make sure it runs for no more than 4 seconds
 	{
 		t0 = micros();
+		t_run = t0-t_start;
 		integral = integral_prior + error*dt/1000000;
 		u = 0.3*error + 0.01*integral;
 		error_prior = error;
@@ -547,7 +573,7 @@ void PI_roll(int d)
 				in_range_counts++;	//incriment number of measureemtns in range
 			}
 		}
-		
+		Serial.println(error);
 		bluetooth_com();
 		dt = (micros()-t0); //time to run through entire loop in us			
 	}
@@ -565,9 +591,12 @@ void PI_turn(int a)
 	error = a-turned;
 	integral = 0;
 	in_range_counts=0; //clear number of measurements where error is low
-	while(in_range_counts<3)
+	t_start = micros();
+	t_run = 0;
+	while(t_run<4000000  && in_range_counts<3)
 	{
 		t0 = micros();
+		t_run = t0-t_start;
 		integral = integral_prior + error*dt/1000000;
 		u = 2.4*error + 3*integral;
 		error_prior = error;
@@ -618,9 +647,10 @@ void PI_turn(int a)
 			{
 				in_range_counts++;	//incriment number of measureemtns in range
 			}
+		
 		}
 		
-		//bluetooth_com();
+		bluetooth_com();
 		dt = (micros()-t0); //time to run through entire loop in us			
 	}
 	//turn off motors
@@ -761,9 +791,32 @@ void bluetooth_com(void)
 
   if (availableMessage())
   {
-      Serial.println("Bluetooth Message:");
-      Serial.println(pullMessage());
-      printOverBluetooth("Message Received.");
+      //Serial.println("Bluetooth Message:");
+      //Serial.println(pullMessage());
+	  msg = atoi(pullMessage()); //convert message to an int
+	  //Serial.print(msg);
+	  if(msg==777) //777 means done
+	  {
+		  printOverBluetooth("Path completed");
+		  while(1); //all done
+	  }
+	  else if(msg==888) //888 means roll
+	  {
+		  //Serial.println("Time To Roll!");
+		  time_to_roll = 1;
+	  }
+	  else if(msg==999) ///999 means turn
+	  {
+		  //Serial.println("Time To Turn");
+		  time_to_turn = 1;
+	  }
+	  else
+	  {
+		  //Serial.print("command: ");
+		  cmd_val = msg;	
+		  //Serial.println(cmd_val);
+	  }
+      //printOverBluetooth("Message Received.");
   }
 
   if (bytestream_active)

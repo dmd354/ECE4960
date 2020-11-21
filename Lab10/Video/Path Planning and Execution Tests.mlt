@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<mlt LC_NUMERIC="C" version="6.21.0" title="Shotcut version 20.07.11" producer="main_bin">
+  <profile description="automatic" width="1920" height="1080" progressive="1" sample_aspect_num="1" sample_aspect_den="1" display_aspect_num="1920" display_aspect_den="1080" frame_rate_num="103800" frame_rate_den="3463" colorspace="709"/>
+  <playlist id="main_bin">
+    <property name="xml_retain">1</property>
+  </playlist>
+  <producer id="black" in="00:00:00.000" out="00:02:36.231">
+    <property name="length">00:02:36.265</property>
+    <property name="eof">pause</property>
+    <property name="resource">0</property>
+    <property name="aspect_ratio">1</property>
+    <property name="mlt_service">color</property>
+    <property name="mlt_image_format">rgb24a</property>
+    <property name="set.test_audio">0</property>
+  </producer>
+  <playlist id="background">
+    <entry producer="black" in="00:00:00.000" out="00:02:36.231"/>
+  </playlist>
+  <producer id="producer0" in="00:00:00.000" out="00:01:15.013">
+    <property name="length">00:01:15.046</property>
+    <property name="eof">pause</property>
+    <property name="resource">Video Nov 18, 10 09 03 AM.mov</property>
+    <property name="audio_index">1</property>
+    <property name="video_index">0</property>
+    <property name="mute_on_pause">0</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="seekable">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="creation_time">2020-11-18T15:09:03</property>
+    <property name="shotcut:hash">914281e057f9abe9e7f966ffd7e68bbd</property>
+    <property name="ignore_points">0</property>
+    <property name="shotcut:caption">Video Nov 18, 10 09 03 AM.mov</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="global_feed">1</property>
+    <property name="xml">was here</property>
+  </producer>
+  <producer id="producer1" in="00:00:00.000" out="00:00:44.906">
+    <property name="length">00:00:44.939</property>
+    <property name="eof">pause</property>
+    <property name="resource">Video Nov 18, 11 12 05 AM.mov</property>
+    <property name="audio_index">1</property>
+    <property name="video_index">0</property>
+    <property name="mute_on_pause">0</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="seekable">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="creation_time">2020-11-18T16:12:05</property>
+    <property name="shotcut:hash">78d0d3589a7752b3d1f5895672d6ea39</property>
+    <property name="ignore_points">0</property>
+    <property name="shotcut:caption">Video Nov 18, 11 12 05 AM.mov</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="global_feed">1</property>
+    <property name="xml">was here</property>
+  </producer>
+  <producer id="producer2" in="00:00:00.000" out="00:00:40.235">
+    <property name="length">00:00:40.268</property>
+    <property name="eof">pause</property>
+    <property name="resource">Video Nov 18, 10 36 47 AM.mov</property>
+    <property name="audio_index">1</property>
+    <property name="video_index">0</property>
+    <property name="mute_on_pause">0</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="seekable">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="creation_time">2020-11-18T15:36:47</property>
+    <property name="shotcut:hash">2e56596a3e41b1744ba94feccd3e2320</property>
+    <property name="ignore_points">0</property>
+    <property name="shotcut:caption">Video Nov 18, 10 36 47 AM.mov</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="global_feed">1</property>
+    <property name="xml">was here</property>
+  </producer>
+  <producer id="producer3" in="00:00:00.000" out="00:00:26.590">
+    <property name="length">00:00:26.623</property>
+    <property name="eof">pause</property>
+    <property name="resource">Video Nov 18, 10 50 58 AM.mov</property>
+    <property name="audio_index">1</property>
+    <property name="video_index">0</property>
+    <property name="mute_on_pause">0</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="seekable">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="creation_time">2020-11-18T15:50:58</property>
+    <property name="shotcut:hash">41d3e66871218a7c4ca767973c38fea9</property>
+    <property name="ignore_points">0</property>
+    <property name="shotcut:caption">Video Nov 18, 10 50 58 AM.mov</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="global_feed">1</property>
+    <property name="xml">was here</property>
+  </producer>
+  <producer id="producer4" in="00:00:00.000" out="00:00:53.380">
+    <property name="length">00:00:53.413</property>
+    <property name="eof">pause</property>
+    <property name="resource">Video Nov 18, 10 57 05 AM (1).mov</property>
+    <property name="audio_index">1</property>
+    <property name="video_index">0</property>
+    <property name="mute_on_pause">0</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="seekable">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="creation_time">2020-11-18T15:57:05</property>
+    <property name="shotcut:hash">b1367cb6cbcf2a554a2e2cfb9a676188</property>
+    <property name="ignore_points">0</property>
+    <property name="shotcut:caption">Video Nov 18, 10 57 05 AM (1).mov</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="global_feed">1</property>
+    <property name="xml">was here</property>
+  </producer>
+  <playlist id="playlist0">
+    <property name="shotcut:video">1</property>
+    <property name="shotcut:name">V1</property>
+    <entry producer="producer0" in="00:00:04.938" out="00:00:47.741"/>
+    <entry producer="producer1" in="00:00:20.117" out="00:00:43.338"/>
+    <entry producer="producer2" in="00:00:00.000" out="00:00:36.865"/>
+    <entry producer="producer3" in="00:00:04.370" out="00:00:25.422"/>
+    <entry producer="producer4" in="00:00:02.736" out="00:00:34.864"/>
+  </playlist>
+  <producer id="producer5" in="00:00:00.000" out="03:59:60.019">
+    <property name="length">04:00:00.033</property>
+    <property name="eof">pause</property>
+    <property name="resource">c:/Users/diangd/Documents/GitHub/ECE4960/Lab10/Video/Video Graphics.png</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2020-11-20T00:28:57</property>
+    <property name="shotcut:hash">9bafbbee1574648e8648bf760fdf4228</property>
+    <property name="global_feed">1</property>
+    <property name="shotcut:caption">Video Graphics.png</property>
+  </producer>
+  <producer id="producer6" in="00:00:00.000" out="03:59:60.019">
+    <property name="length">04:00:00.033</property>
+    <property name="eof">pause</property>
+    <property name="resource">c:/Users/diangd/Documents/GitHub/ECE4960/Lab10/Video/Video Graphics (1).png</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2020-11-20T00:29:33</property>
+    <property name="shotcut:hash">6d6c0c662b7f7cfb9b9fa4240d1b04ed</property>
+    <property name="global_feed">1</property>
+    <property name="shotcut:caption">Video Graphics (1).png</property>
+  </producer>
+  <producer id="producer7" in="00:00:00.000" out="03:59:60.019">
+    <property name="length">04:00:00.033</property>
+    <property name="eof">pause</property>
+    <property name="resource">c:/Users/diangd/Documents/GitHub/ECE4960/Lab10/Video/Video Graphics (2).png</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2020-11-20T00:30:05</property>
+    <property name="shotcut:hash">a630e3b14c2d4906ce8f2f0e360984be</property>
+    <property name="global_feed">1</property>
+    <property name="shotcut:caption">Video Graphics (2).png</property>
+  </producer>
+  <producer id="producer8" in="00:00:00.000" out="03:59:60.019">
+    <property name="length">04:00:00.033</property>
+    <property name="eof">pause</property>
+    <property name="resource">c:/Users/diangd/Documents/GitHub/ECE4960/Lab10/Video/Video Graphics (3).png</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2020-11-20T00:30:35</property>
+    <property name="shotcut:hash">d64966f77d24fb95f1eb7b9757d134c6</property>
+    <property name="global_feed">1</property>
+    <property name="shotcut:caption">Video Graphics (3).png</property>
+  </producer>
+  <producer id="producer9" in="00:00:00.000" out="03:59:60.019">
+    <property name="length">04:00:00.033</property>
+    <property name="eof">pause</property>
+    <property name="resource">c:/Users/diangd/Documents/GitHub/ECE4960/Lab10/Video/Video Graphics (4).png</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2020-11-20T00:30:56</property>
+    <property name="shotcut:hash">3ce759c59dda65ca919525dcf5af782b</property>
+    <property name="global_feed">1</property>
+    <property name="shotcut:caption">Video Graphics (4).png</property>
+    <property name="xml">was here</property>
+  </producer>
+  <playlist id="playlist1">
+    <property name="shotcut:video">1</property>
+    <property name="shotcut:name">V2</property>
+    <entry producer="producer5" in="00:00:00.000" out="00:00:42.804"/>
+    <entry producer="producer6" in="00:00:00.000" out="00:00:23.220"/>
+    <entry producer="producer7" in="00:00:00.000" out="00:00:36.865"/>
+    <entry producer="producer8" in="00:00:00.000" out="00:00:21.052"/>
+    <entry producer="producer9" in="00:00:00.000" out="00:00:32.128"/>
+  </playlist>
+  <tractor id="tractor0" title="Shotcut version 20.07.11" global_feed="1" in="00:00:00.000" out="00:02:36.231">
+    <property name="shotcut">1</property>
+    <property name="shotcut:projectAudioChannels">2</property>
+    <property name="shotcut:projectFolder">1</property>
+    <track producer="background"/>
+    <track producer="playlist0"/>
+    <track producer="playlist1"/>
+    <transition id="transition0">
+      <property name="a_track">0</property>
+      <property name="b_track">1</property>
+      <property name="mlt_service">mix</property>
+      <property name="always_active">1</property>
+      <property name="sum">1</property>
+    </transition>
+    <transition id="transition1">
+      <property name="a_track">0</property>
+      <property name="b_track">1</property>
+      <property name="version">0.9</property>
+      <property name="mlt_service">frei0r.cairoblend</property>
+      <property name="disable">1</property>
+    </transition>
+    <transition id="transition2">
+      <property name="a_track">0</property>
+      <property name="b_track">2</property>
+      <property name="mlt_service">mix</property>
+      <property name="always_active">1</property>
+      <property name="sum">1</property>
+    </transition>
+    <transition id="transition3">
+      <property name="a_track">1</property>
+      <property name="b_track">2</property>
+      <property name="version">0.9</property>
+      <property name="mlt_service">frei0r.cairoblend</property>
+      <property name="disable">0</property>
+    </transition>
+  </tractor>
+</mlt>

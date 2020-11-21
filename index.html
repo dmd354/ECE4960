@@ -2490,23 +2490,561 @@ loc.plotter.visualize_bel()
                                     <div class="divider-custom">
                                         <div class="divider-custom-line"></div>
                                     </div>
-                                    <!-- Lab Modal - Image-->
-                                    <!--<img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="" />-->
-                                    <!-- Lab Modal - Text-->
-                                    <p class="mb-5">Coming soon...</p>
-									
-									<p></p>
-									
+                                   	<h3>Abstract</h3>
+									<br>
+									<p>In this lab, paths were planned and executed in the simulation environment and in the real-world workspace.</p>
+									<br>
+									<h3>Map</h3>
+									<br>
+									<p>By looking at the map created in lab 7 in the plotter, the occupancy grid was written as follows:</p>
 									<br>
 									<pre><code>
+grid = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 1, 1, 0, 0, 0, 0, 0, 0, 0,
+		0, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+		0, 1, 0, 1, 1, 1, 1, 1, 1, 0,
+		0, 1, 0, 1, 1, 0, 0, 0, 1, 0,
+		0, 1, 0, 0, 0, 0, 0, 0, 1, 0,
+		0, 1, 0, 0, 0, 0, 1, 1, 1, 0,
+		0, 1, 0, 0, 0, 0, 1, 0, 0, 0,
+		0, 1, 1, 1, 1, 1, 1, 0, 0, 0]
+									</code></pre>
+									<br>
+									<p>The map made from this grid with an example start and end position can be seen below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab10/img/0p2.png" alt="" />
+									<br>
+									<p>Since the workspace I am using is so small, I reduced the cell size to 0.1m so that there would be more cells within the space. This changed the occupancy grid and resulting map to the following.</p>
+									<br>
+									<pre><code>
+grid = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
+		0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
+		0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
+		0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
+		0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
+		0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
+		0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0,
+		0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+		0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+		0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+									</code></pre>
+									<br>
+									<img class="img-fluid mb-5" src="Lab10/img/0p1.png" alt="" />
+									<br>
+									<p>This finer map allows for more interesting problems.</p>
+									<br>
+									<h3>Planning</h3>
+									<br>
+									<p>To plan the path, I wanted to use the A* algorithm so I found an open source <a href="https://github.com/richardos/occupancy-grid-a-star">GitHub repository</a> created by Richardos Drakoulis that had a Python implementation of the A* algorithm in a 2D Occupancy Grid Map.</p>
+									<p>One of the examples given in the repository was modified to use the grid created. Some png stuff was commented out since it was causing errors and wasn’t needed for my purposes. It was found that since the provided code initially used images to define the maps, my map was flipped horizontally by the algorithm. To fix this, the grid was flipped with the <code>numpy.flip()</code> function. A function was written to convert the start and end points from those given by planner query to those that would be taken by the planner:</p>
+									<br>
+									<pre><code>
+def grid2plan(x,y):
+    # converts grid point to node for planner
+    # x and y are flipped
+    # y value is inverted
+    # planner takes input of meters
+    return (y*0.1, (19-x)*0.1)
 
 									</code></pre>
 									<br>
-									
+									<p>The modified example code that runs the A* search algorithm is copied below.</p>
 									<br>
-									<img class="img-fluid mb-5" src="Lab10/img/_.png" alt="" />
+									<pre><code>
+#flip grid
+grid_flipped = np.flip(grid,0)
+# load the map
+gmap = OccupancyGridMap(grid_flipped, cell_size=0.1, occupancy_threshold=1)
+
+# set a start and an end node (in meters)
+start_node = grid2plan(14, 12)
+goal_node = grid2plan(9, 6)
+
+# run A*
+path, path_px = a_star(start_node, goal_node, gmap, movement='4N')
+gmap.plot()
+
+if path:
+    # plot resulting path in pixels over the map
+    plot_path(path_px)
+else:
+    print('Goal is not reachable')
+
+    # plot start and goal points over the map (in pixels)
+    start_node_px = gmap.get_index_from_coordinates(start_node[0], start_node[1])
+    goal_node_px = gmap.get_index_from_coordinates(goal_node[0], goal_node[1])
+
+    plt.plot(start_node_px[0], start_node_px[1], 'ro')
+    plt.plot(goal_node_px[0], goal_node_px[1], 'go')
+
+plt.show()
+									</code></pre>
+									<br>
+									<p>A few examples of the start and end points generated by the planner query and the solution found by the algorithm are shown below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab10/img/table.png" alt="" />
+									<br>
+									<p>To keep simplicity, I decided to use the 4N solutions of the A* algorithm so that I only had to deal with motion in the four cardinal directions. Since the A* algorithm only gives waypoints for the path to be followed, I wrote a few functions that would translate these points into commands for the robot to follow. I copied the <code>normalize_angle</code> function from robot_interface.py, wrote a <code>minimize_commands</code> function that combines sequential commands to move in the same direction, and wrote a <code>points2commands</code> function that uses the other two functions to translates the points found by the algorithm to a list of commands in the form (turn [deg], translate [cells]). These functions are copied below.</p>
+									<br>
+									<pre><code>
+def normalize_angle(a):
+    # copied from robot_interface
+    new_a = a
+    while (new_a &lt; -180):
+        new_a = new_a + 360
+    while (new_a >= 180):
+        new_a = new_a - 360
+    return new_a
+
+def minimize_commands(cmds):
+    #takes in comands of (turn angle, distance) and reduces them to minimum number of steps
+    min_cmds = [] # minimized list of commands
+    cmd = None
+    for ind in range(len(cmds)):
+        if cmds[ind][0]!=0: # turn
+            if ind!=0: #skip first one
+                min_cmds.append(cmd) # add previous command to list
+            cmd = cmds[ind] #create new command
+        else: #no turn
+            cmd = (cmd[0], cmd[1]+cmds[ind][1]) #add on distance
+    min_cmds.append(cmd)
+    return min_cmds
+            
+        
+def points2commands(points):
+    # takes in waypoints calculated by A* and translates them into a series of turns and linear movements
+    # output commands in the form: (turn angle [deg], linear distance[cells])
+    # assumes only motion in x or y direction (4N)
+    cmds = [] #list of commands
+    for ind in range(len(points)-1):
+        if ind==0:
+            start_angle = 0 # assume the robot starts with an angle of 0
+        else:
+            start_angle = start_angle+turn #start angle is previous start angle + the turn angle
+        x0 = points[ind][0] #start x
+        y0 = points[ind][1] #start y
+        x1 = points[ind+1][0] #end x
+        y1 = points[ind+1][1] #end y
+        if x0==x1: #translation in y direction
+            dist = abs(y1-y0) # distance to travel in cells
+            trans_angle = 90*np.sign(y1-y0) #+90 if going up, -90 if going down
+        else: #translation in x direction
+            dist = abs(x1-x0) # distance to travel  in cells
+            trans_angle = 90-90*np.sign(x1-x0) #0 if going right, 180 if going down
+        turn = normalize_angle(trans_angle-start_angle)
+        cmds.append((turn, dist))
+    return minimize_commands(cmds)
+									</code></pre>
+									<br>
+									<p>The points2commands function was tested for a few of the generated start and end points and it gave the expected commands. For example, it returned <code>[(-180, 4), (90, 2), (-90, 4), (-90, 3)]</code> for the last start and end point in the table above.</p>
+									<p>To calculate and display where to start the robot, and where it should end, the following code was written to convert the start node from the planner to a location in inches within my workspace frame.</p>
+									<br>
+									<pre><code>
+def plan2cont(point):
+    # converts planner coordinates [m] to continuous coordinates [in]
+    # returns continuous dimensions in inches so that robot can be places in starting position using tape measure
+    #the origin of the grid is half a cell below and to the left of the continuous origin
+    #each cell is 0.1x0.1m
+    return ((point[0]-.05)*39.3701, (point[1]-.05)*39.3701)
+
+cont_start_point = plan2cont(start_node)
+cont_end_point = plan2cont(goal_node)
+print('start robot at ({:.1f}, {:.1f}) inches'.format(cont_start_point[0], cont_start_point[1]))
+print('robot should end at ({:.1f}, {:.1f}) inches'.format(cont_end_point[0], cont_end_point[1]))
+									</code></pre>
+									<br>
+									<h3>Simulated Robot</h3>
+									<br>
+									<p>To test my commands, I simulated them with the lab9-manager. So the simulated robot wouldn’t run into the walls in the original simulation environment, I commented out the lines in playground.world that defined the obstacles to get a blank world.</p>
+									<p>The following code was written to use the generated commands to move the robot and plot the trajectory in the map.</p>
+									<br>
+									<pre><code>
+from robot_interface import *
+
+import time
+import numpy as np
+import rospy
+from Traj import Trajectory
+
+
+sim_robot = VirtualRobot()
+
+def sim_turn(a):
+    # a = angle in deg
+    sim_robot.set_vel(0,np.sign(a)*1.570796327) # rotate 90deg/sec
+    time.sleep(abs(a/90))
+    sim_robot.set_vel(0,0) #stop
+    
+def sim_roll(d):
+    # d = distance in mm
+    sim_robot.set_vel(1,0) # roll 1m/s
+    time.sleep(d/1000)
+    sim_robot.set_vel(0,0) #stop
+
+def update_plot(start_point):
+    #plots the ground truth of the robot
+    # since the simulated robot starts at (0,0) in the simulation frame,
+    # I just offset its position by the path start point to get the plot
+    gt_pose = sim_robot.get_gt_pose()
+    plotter.plot_point(gt_pose[0]+start_point[0], gt_pose[1]+start_point[1], GT)
+
+
+# Start points for each line segment describing the map
+start_points = np.array([[0.026,  0.015], [1.117, -0.022], [1.121,  0.230], [1.470,  0.225], [1.490,  0.887], [0.790,  0.889], [0.759,  0.676], [0.601,  0.689], [0.589,  1.182], [0.075,  1.218]])
+
+# End points for each line segment describing the map
+end_points = np.array([[1.117, -0.022], [1.121,  0.230], [1.470,  0.225], [1.490,  0.887], [0.790,  0.889], [0.759,  0.676], [0.601,  0.689], [0.589,  1.182], [0.075,  1.218], [0.026,  0.015]])
+
+mapper = Mapper(min_x=-2, max_x=2, min_y=-2, max_y=2, min_a=-180, max_a=180,
+                cell_size_x=0.2, cell_size_y=0.2, cell_size_a=20,
+                max_cells_x=20, max_cells_y=20, max_cells_a=18,
+                ray_length=6, lines=[start_points, end_points], obs_per_cell=18, 
+                robot=sim_robot)
+
+loc = Localization(sim_robot, mapper, 0.11, 0.33, 15)
+
+loc.plotter.visualize_map()
+plotter = Plotter(loc)
+plotter.reset_plot()
+    
+start_point = (start_node[0]-0.05, start_node[1]-0.05)
+
+sim_robot.reset()
+for cmd in commands:
+    #send turn command to robot
+    sim_turn(cmd[0])
+    update_plot(start_point)
+    sim_roll(cmd[1]*100)
+    update_plot(start_point)
+									</code></pre>
+									<br>
+									<p>A few examples of this code running can be seen in the following video.</p>
+									<br>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/ItpG9wHX0O0" allowfullscreen></iframe>
+									</div>
+									<br>
+									<p>The simulated robot does a very good job of using the commands to follow the path.</p>
+									<br>
+									<h3>Real Robot</h3>
+									<br>
+									<p>In the Arduino sketch, functions were written to move the robot forward a specified distance, or turn the robot a specified angle. These functions use PI control to put the robot in a desired pose relative to where it started. For measuring distances, the ToF sensor was used, and for measuring angles, the gyroscope was used. The functions run the PI control until a certain number of measurements are made in a range that is considered acceptable. This was done to prevent the robot overshooting and stopping since it measured one value in the right range. The functions are copied below.</p>
+									<br>
+									<pre><code>
+void PI_roll(int d)
+{
+	// function that uses PI control to set inputs to move the robot a specified distance
+	// uses ToF sensor to get distance assuming there will be a stationary object in front of the robot to reference
+	// d is distance you want to move in mm
+	integral = 0;
+	while(!distanceSensor.checkForDataReady()); //wait fro ToF measurement
+	distance = distanceSensor.getDistance(); //Get the result of the measurement from ToF sensor
+	distanceSensor.clearInterrupt();
+	dist_d = distance-d;	//desired distance from wall
+	error = d;
+	in_range_counts=0; //clear number of measurements where error is low
+	while(in_range_counts&lt;1)
+	{
+		t0 = micros();
+		integral = integral_prior + error*dt/1000000;
+		u = 0.3*error + 0.01*integral;
+		error_prior = error;
+		integral_prior = integral;
+		if(u>=0) //u is positive: go forward
+		{
+			if(u>150) //limit motor speed to reduce overshoot
+			{
+				L_motor_val = 150;
+				R_motor_val = 150;
+			}
+			else
+			{
+				L_motor_val = u; 
+				R_motor_val = u;
+			}
+			myMotorDriver.setDrive( L_MOTOR, FWD, L_motor_val); 
+			myMotorDriver.setDrive( R_MOTOR, FWD, R_motor_val);
+			}
+		else //u is negative: go backwards
+		{
+			if(u&lt;-150)
+			{
+				L_motor_val = 150;
+				R_motor_val = 150;
+			}
+			else
+			{
+				L_motor_val = -u;
+				R_motor_val = -u;
+			}
+			myMotorDriver.setDrive( L_MOTOR, REV, L_motor_val); 
+			myMotorDriver.setDrive( R_MOTOR, REV, R_motor_val);
+		}
+		if(distanceSensor.checkForDataReady())
+		{  
+			distance = distanceSensor.getDistance(); //Get the result of the measurement from ToF sensor
+			distanceSensor.clearInterrupt();
+			error = distance-dist_d; //positive error will result in a positive u
+			if(error&lt;10 &amp;&amp; error>-10) //if error is within an acceptable tolerance
+			{
+				in_range_counts++;	//increment number of measurements in range
+			}
+		}
+		
+		bluetooth_com();
+		dt = (micros()-t0); //time to run through entire loop in us			
+	}
+	//turn off motors
+	myMotorDriver.setDrive( L_MOTOR, REV, 0); 
+	myMotorDriver.setDrive( R_MOTOR, REV, 0);
+}
+
+void PI_turn(int a)
+{
+	// function that uses PI control to turn the robot a specified angle
+	// gyroscope to calculate angle of turn
+	// a is distance you want to turn in deg
+	turned = 0;  //clear turn
+	error = a-turned;
+	integral = 0;
+	in_range_counts=0; //clear number of measurements where error is low
+	while(in_range_counts&lt;3)
+	{
+		t0 = micros();
+		integral = integral_prior + error*dt/1000000;
+		u = 2.4*error + 3*integral;
+		error_prior = error;
+		integral_prior = integral;
+		if(u>=0) //u is positive: turn left
+		{
+			if(u>200) //limit motor speed to reduce overshoot
+			{
+				L_motor_val = 200;
+				R_motor_val = 200;
+			}
+			else
+			{
+				L_motor_val = u; 
+				R_motor_val = u;
+			}
+			myMotorDriver.setDrive( L_MOTOR, REV, L_motor_val); 
+			myMotorDriver.setDrive( R_MOTOR, FWD, R_motor_val);
+			}
+		else //u is negative: turn right
+		{
+			if(u&lt;-200)
+			{
+				L_motor_val = 200;
+				R_motor_val = 200;
+			}
+			else
+			{
+				L_motor_val = -u;
+				R_motor_val = -u;
+			}
+			myMotorDriver.setDrive( L_MOTOR, FWD, L_motor_val); 
+			myMotorDriver.setDrive( R_MOTOR, REV, R_motor_val);
+		}
+		if( myICM.dataReady() )
+		{
+			myICM.getAGMT(); // The values are only updated when you call 'getAGMT'
+			gyro_z = myICM.gyrZ();  //z measurement from gyroscope (angular speed)
+			turned = turned+gyro_z*(float)dt/1000000; //integral of angular velocity
+		}  
+		if(distanceSensor.checkForDataReady())
+		{  
+			distance = distanceSensor.getDistance(); //Get the result of the measurement from ToF sensor
+			distanceSensor.clearInterrupt();
+			error = a-turned; //positive error will result in a positive u
+			Serial.println(error);
+			if(error&lt;5 &amp;&amp; error>-5) //if error is within an acceptable tolerance
+			{
+				in_range_counts++;	//increment number of measurements in range
+			}
+		}
+		
+		//bluetooth_com();
+		dt = (micros()-t0); //time to run through entire loop in us			
+	}
+	//turn off motors
+	myMotorDriver.setDrive( L_MOTOR, REV, 0); 
+	myMotorDriver.setDrive( R_MOTOR, REV, 0);
+}
+
+									</code></pre>
+									<br>
+									<p>These functions required a good amount of tuning of the gain values, speed limits, and number of required measurements in the desired range, but were eventually tuned to the point of being acceptable for initial testing. The functions were later changed to stop running the controller after 4 seconds to prevent the robot from getting a new command while it was still running with significant steady-state error.</p>
+									<p>In Main.py I made myRobotTasks() pass, and added a class and instantiate it so it could be used in the Jupyter notebook:</p>
+									<br>
+									<pre><code>
+class RobotHolder:
+    def __init__(self):
+        self.robot = None
+    def getRobot(self):
+        return self.robot
+    def setRobot(self, robot):
+        self.robot = robot
+theRobotHolder = RobotHolder()
+									</code></pre>
+									<br>
+									<p>In main.py, I also set the robot where the bleak client is made with the line: <code>theRobotHolder.setRobot(theRobot)</code>.</p>
+									<p>In the notebook, after my mapping and planning code, I added the following lines to establish the a connection with the robot:</p>
+									<br>
+									<pre><code>
+# Automatically reload changes in python modules
+%load_ext autoreload
+%autoreload 2
+
+#Import Classes
+from main import *
+from robot_interface import *
+import time
+from Traj import Trajectory
+
+loop = asyncio.get_event_loop()
+asyncio.gather(robotTest(loop))
+									</code></pre>
 									<br>
 									
+									<p>Commands were sent to the robot using the existing message feature in the ece4960robot.py file. The protocol I came up with was to send the robot a number, which would correspond to either a distance or an angle, and then send another message with a code that would be translated into either doing a turn or a translation. The code to send the messages corresponding to each command is copied below.</p>
+									<br>
+									<pre><code>
+theRobot = theRobotHolder.getRobot()
+
+# codes for different command types
+done = '777'
+roll = '888'
+turn = '999'
+
+# send commands to robot
+for cmd in commands:
+    #send turn command to robot
+    t_val = '{}'.format(cmd[0])
+    await theRobot.sendMessage(t_val)
+    time.sleep(1)
+    await theRobot.sendMessage(turn)
+    time.sleep(5)#Wait for turn to finish
+    
+    #send translation command to robot
+    r_val = '{}'.format(cmd[1]*100)
+    await theRobot.sendMessage(r_val) #in mm
+    time.sleep(1)
+    await theRobot.sendMessage(roll)
+    time.sleep(5)#Wait for translation to finish
+
+await theRobot.sendMessage(done)
+time.sleep(30) # wait for everything to finnish up
+									</code></pre>
+									<br>
+									<p>To respond to these commands, the message-handling code in my bluetooth communication function in the Arduino Sketch was changed to the following. It can be seen that when the robot receives the “done” code it indicates that it is done by printing over bluetooth.</p>
+									<br>
+									<pre><code>
+if (availableMessage())
+  {
+      //Serial.println("Bluetooth Message:");
+      //Serial.println(pullMessage());
+	  msg = atoi(pullMessage()); //convert message to an int
+	  //Serial.print(msg);
+	  if(msg==777) //777 means done
+	  {
+		  printOverBluetooth("Path completed");
+		  while(1); //all done
+	  }
+	  else if(msg==888) //888 means roll
+	  {
+		  //Serial.println("Time To Roll!");
+		  time_to_roll = 1;
+	  }
+	  else if(msg==999) ///999 means turn
+	  {
+		  //Serial.println("Time To Turn");
+		  time_to_turn = 1;
+	  }
+	  else
+	  {
+		  //Serial.print("command: ");
+		  cmd_val = msg;	
+		  //Serial.println(cmd_val);
+	  }
+      //printOverBluetooth("Message Received.");
+  }
+									</code></pre>
+									<br>
+									<p>To poll for the values set above and respond appropriately, the main function in the sketch was changed to the code below.</p>
+									<br>
+									<pre><code>
+void loop()
+{
+	if(time_to_roll)
+	{
+		Serial.print("Lets roll ");
+		Serial.println(cmd_val);
+		PI_roll(cmd_val);
+		printOverBluetooth("Done rolling");
+		time_to_roll=0;
+	}
+	if(time_to_turn)
+	{
+		Serial.print("Lets turn ");
+		Serial.println(cmd_val);
+		PI_turn(cmd_val);
+		printOverBluetooth("Done turning");
+		time_to_turn=0;
+	}
+	bluetooth_com();  //bluetooth communication
+}
+									</code></pre>
+									<br>
+									<p>This communication method was found to work, but was rather slow due to the fact that the Jupyter notebook always waits a certain amount of time before sending the next command. I attempted to have the notebook move to the next command after the robot printed it’s done message over bluetooth, but I couldn’t get this to work the way I wanted it to. Therefore, in the interest of time, I moved on.</p>
+									<br>
+									<h3>Physical Testing</h3>
+									<br>
+									<p>Before I could begin testing, my Artemeis board began acting up, and when I would try to upload code to it, the Arduino IDE would give the following Error message.</p>
+									<br>
+									<pre><code>
+Artemis SVL Bootloader
+Target failed to enter bootload mode. Verify the right COM port is selected and that your board has the SVL bootloader.
+									</code></pre>
+									<br>
+									<p>To try to fix this issue, several things were tried, most of which are documented on <a href="https://campuswire.com/c/GBD54AB15/feed/162">Campuswire</a>. The solution to the issue ended up being replacing my Artemis board.</p>
+									<p>Several different paths were tested on the real robot. The start and end points of these paths were generated by the provided path query code. The results of the best 5 of these tests are tabulated below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab10/img/table2.png.png" alt="" />
+									<br>
+									<p>Videos of these five tests can be seen in the video below which shows the planned path of the current test in the corner of the screen.</p>
+									<br>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/VxPNR3b4kso" allowfullscreen></iframe>
+									</div>
+									<br>
+									<p>Note: after the first test, the time delays in the notebook and maximum run times in the Arduino sketch were shortened to increase the speed of the run.</p>
+									<p>It can be seen that the robot does a decent job of following the first three simpler paths other than the fact that it overshoots slightly and has some small collisions on the second and third run. The robot performs very poorly on the more complicated paths that go around the obstacle in the middle of the map. Since the robot had a tendency to overshoot and correct when turning, it would drift far from where it started and the assumption that it turned around its axis no longer stands. In the last test, it can also be seen that when the robot is commanded to move a very small distance, it struggles because of the deadband in the motors and the limited time of the control loop. These issues caused the robot to not successfully complete the more complicated paths.</p>
+									<br>
+									<h3>Areas for Improvement</h3>
+									<br>
+									<p>If I had more time to work on this lab I would do the following to improve the performance of the robot.</p>
+									<ul>
+										<li>Further tune the turn and roll functions to reduce overshoot and steady state error.</li>
+										<ul>
+											<li>The overshoot could be reduced by adding a derivative term to the control law</li>
+											<li>The steady state error could be reduced by further tuning the integral gain or potentially having a different control law apply to smaller/larger commands</li>
+										</ul>
+										<li>Include localization before each command to adjust the commands if the robot is not where expected and prevent the robot drifting too far from the specified path.</li>
+										<li>Include obstacle avoidance code that would stop the robot before it runs into any walls or obstacles</li>
+										<li>Have the next command be sent to the robot as soon as the robot finishes the current command to increase the speed at which the path is executed.</li>
+									</ul>
+									<br>
                                     <button class="btn btn-dark" data-dismiss="modal">
                                         <i class="fas fa-times fa-fw"></i>
                                         Close Window
