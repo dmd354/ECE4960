@@ -3074,7 +3074,7 @@ Target failed to enter bootload mode. Verify the right COM port is selected and 
                                     </div>
                                     <h3>Abstract</h3>
 									<br>
-									<p>In this lab, Full state feedback control was implemented on a simulated cart-pendulum system. Controllers were used on an idealized system. These ideal assumptions were then loosened to assess how a controller would work on a more realistic system.</p>
+									<p>In this lab, full state feedback control was implemented on a simulated cart-pendulum system. Controllers were used on an idealized system. The ideal assumptions were then loosened to assess how a controller would work on a more realistic system.</p>
 									<br>
 									<h3>Feedback control of an idealized pendulum on a cart system</h3>
 									<br>
@@ -3156,7 +3156,7 @@ ctrl = pendulumCnt(param=P,K=Kr,zref=ref.square)
 									<br>
 									<img class="img-fluid mb-5" src="Lab11/img/table1.png" alt="" />
 									<br>
-									<p>For all of the weighting matrices I tried, The controller still kept the pendulum upright and stable no matter how large I made the R matrix. It seems that this idealized model is quite robotst. At this point, I would probably choose the Q and R matrices of all ones since It gives a fairly quick and accurate response, and places the poles at [-4.08700569, -2.08575865+0.42468486j, -2.08575865-0.42468486j, -0.84851386] which are pretty “slow” and the hardware should be able to handle them. It can also be noted that all of these poles are in the left-half plane and therefore ensure that the system will be asymptotically stable, and the complex poles indicate some oscillatory behaviour. This choice is expected to change once I start loosening the ideal assumptions made to get to this point.</p>
+									<p>For all of the weighting matrices I tried, The controller still kept the pendulum upright and stable no matter how large I made the R matrix. It seems that this idealized model is quite robotst. At this point, I would probably choose the Q and R matrices of all ones since It gives a fairly quick and accurate response, and places the poles at [-4.08700569, -2.08575865+0.42468486j, -2.08575865-0.42468486j, -0.84851386] which are pretty “slow” and the hardware should be able to handle them. It can also be noted that all of these poles are in the left-half plane and therefore ensure that the system will be asymptotically stable, and the complex poles indicate some oscillatory behaviour. This choice in controller is expected to change once I start relaxing the ideal assumptions.</p>
 									<br>
 									<h3>Feedback control of a non-ideal pendulum on a cart system</h3>
 									<br>
@@ -3164,7 +3164,7 @@ ctrl = pendulumCnt(param=P,K=Kr,zref=ref.square)
 									<br>
 									<img class="img-fluid mb-5" src="Lab11/img/table2.png" alt="" />
 									<br>
-									<p>It was found that implementing the deadband would break the simulation as it existed. This issue is documented on <a href="https://campuswire.com/c/GBD54AB15/feed/193">Caampuswire</a>. To fix this, the reference position was changed to a sinusoidal signal so that the cart would never stop moving and get stuck in the deadband.</p>
+									<p>It was found that implementing the deadband would break the simulation as it existed. This issue is documented on <a href="https://campuswire.com/c/GBD54AB15/feed/193">Campuswire</a>. To fix this, the reference position was changed to a sinusoidal signal so that the cart would never stop moving and get stuck in the deadband.</p>
 									<p>With diagonal Q values of [1, 1, 10, 100], and R value of 0.01, a sinusoidal reference z with an amplitude of 1 and a frequency of 9, and a deadband reduced to 0.2, I was able to get the desirable performance plotted below.</p>
 									<br>
 									<img class="img-fluid mb-5" src="Lab11/img/deadbandtest1.png" alt="" />
@@ -3177,7 +3177,7 @@ ctrl = pendulumCnt(param=P,K=Kr,zref=ref.square)
 										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/QVQoqxh89hQ" allowfullscreen></iframe>
 									</div>
 									<br>
-									<p>The behavior seen here isn’t as desirable as what was achieved with a smaller deadband and the card oscillates significantly, but it is able to keep the pendulum up.</p>
+									<p>The behavior seen here isn’t as desirable as what was achieved with a smaller deadband and the cart oscillates significantly, but it is able to keep the pendulum up.</p>
 									<p>To improve the performance, the sine wave amplitude was reduced until it reached the point where the simulation would break and then increased slightly. This resulted in an amplitude of 1.6 which gave the dramatically improved results below.</p>
 									<br>
 									<img class="img-fluid mb-5" src="Lab11/img/deadbandtest3.png" alt="" />
@@ -3190,7 +3190,7 @@ ctrl = pendulumCnt(param=P,K=Kr,zref=ref.square)
 									<br>
 									<h3>Feedback control with sensor noise</h3>
 									<br>
-									<p>To generate normally-distributed, zero-mean noise for the sensor measurement, the <code>numpy.random.normat()</code> function was used as shown below.</p>
+									<p>To generate normally-distributed, zero-mean noise for the sensor measurement, the <code>numpy.random.normal()</code> function was used as shown below.</p>
 									<br>
 									<pre><code>
 noise = np.array([[np.random.normal(0, 0.0001)], [np.random.normal(0, 0.0001)], [np.random.normal(0, .0001)], [np.random.normal(0, 0.0001)]])
@@ -3202,13 +3202,13 @@ measurement = curr_state + noise
 									<img class="img-fluid mb-5" src="Lab11/img/noise1.png" alt="" />
 									<br>
 									<p>It can be seen that around 22 seconds, a significant amount of noise causes the system to wiggle a little, but the controller is able to stabilize after this.</p>
-									<p>To try to design a controller that would be able to stabilize the system without breaking the ODE simulation with more noise added, or with noise and the deadband, the Q and R values, z reference signal, noise values, states the noise would be on, and controller limits were adjusted. However, no combination (including one combination that Sadie had gotten to work on her simulation) was successful. Therefore, for the rest of this lab, sensor noise was ignored, but the other non-ideal characteristics were left in.</p>
+									<p>To try to design a controller that would be able to stabilize the system without breaking the ODE simulation with more realistic noise added, or with noise and the deadband, the Q and R values, z reference signal, noise values, states the noise would be on, and controller limits were adjusted. However, no combination (including one combination that Sadie had gotten to work on her simulation) was successful. Therefore, for the rest of this lab, sensor noise was ignored, but the other non-ideal characteristics were left in.</p>
 									<p>To assess the sensitivity of the controller designed to deal with the deadband, the gain matrix was hard coded in so that it would not be recalculated with the perturbed parameters. Then parameters for the system were changed slightly until the controller was no longer to keep the pendulum up, or the simulation broke.</p>
 									<p>The controller was able to work individually for the positive and negative parameter changes tabulated below.</p>
 									<br>
 									<img class="img-fluid mb-5" src="Lab11/img/table3.png" alt="" />
 									<br>
-									<p>It can be seen that the controller is fairly robust to all parameters inaccuracies other than the damping coefficient. This is concerning because the damping coefficient would be the hardest parameter to measure for the real car.</p>
+									<p>It can be seen that the controller is fairly robust to all parameter inaccuracies other than the damping coefficient. This is concerning because the damping coefficient would be the hardest parameter to measure for the real car.</p>
 									<p>Some other factors that would potentially cause the controller to fail in the real system are listed below.</p>
 									<ul>
 										<li>Backlash in the physical system</li>
