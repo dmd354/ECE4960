@@ -3156,7 +3156,7 @@ ctrl = pendulumCnt(param=P,K=Kr,zref=ref.square)
 									<br>
 									<img class="img-fluid mb-5" src="Lab11/img/table1.png" alt="" />
 									<br>
-									<p>For all of the weighting matrices I tried, The controller still kept the pendulum upright and stable no matter how large I made the R matrix. It seems that this idealized model is quite robotst. At this point, I would probably choose the Q and R matrices of all ones since It gives a fairly quick and accurate response, and places the poles at [-4.08700569, -2.08575865+0.42468486j, -2.08575865-0.42468486j, -0.84851386] which are pretty “slow” and the hardware should be able to handle them. This choice is expected to change once I start loosening the ideal assumptions made to get to this point.</p>
+									<p>For all of the weighting matrices I tried, The controller still kept the pendulum upright and stable no matter how large I made the R matrix. It seems that this idealized model is quite robotst. At this point, I would probably choose the Q and R matrices of all ones since It gives a fairly quick and accurate response, and places the poles at [-4.08700569, -2.08575865+0.42468486j, -2.08575865-0.42468486j, -0.84851386] which are pretty “slow” and the hardware should be able to handle them. It can also be noted that all of these poles are in the left-half plane and therefore ensure that the system will be asymptotically stable, and the complex poles indicate some oscillatory behaviour. This choice is expected to change once I start loosening the ideal assumptions made to get to this point.</p>
 									<br>
 									<h3>Feedback control of a non-ideal pendulum on a cart system</h3>
 									<br>
@@ -3190,22 +3190,32 @@ ctrl = pendulumCnt(param=P,K=Kr,zref=ref.square)
 									<br>
 									<h3>Feedback control with sensor noise</h3>
 									<br>
-									<p>To generate normally-distributed, zero-mean noise for the sensor measurement, the numpy.random.normat() function was used as shown below.</p>
-									
-									
-									
-									<p></p>
-									
+									<p>To generate normally-distributed, zero-mean noise for the sensor measurement, the <code>numpy.random.normat()</code> function was used as shown below.</p>
 									<br>
 									<pre><code>
-
+noise = np.array([[np.random.normal(0, 0.0001)], [np.random.normal(0, 0.0001)], [np.random.normal(0, .0001)], [np.random.normal(0, 0.0001)]])
+measurement = curr_state + noise
 									</code></pre>
 									<br>
-									
+									<p>By removing the deadband limit, and adjusting the controller and reference signal, I was able to get the following response with the small amount of noise on each measured state shown above.</p>
 									<br>
-									<img class="img-fluid mb-5" src="Lab11/img/_.png" alt="" />
+									<img class="img-fluid mb-5" src="Lab11/img/noise1.png" alt="" />
 									<br>
-									
+									<p>It can be seen that around 22 seconds, a significant amount of noise causes the system to wiggle a little, but the controller is able to stabilize after this.</p>
+									<p>To try to design a controller that would be able to stabilize the system without breaking the ODE simulation with more noise added, or with noise and the deadband, the Q and R values, z reference signal, noise values, states the noise would be on, and controller limits were adjusted. However, no combination (including one combination that Sadie had gotten to work on her simulation) was successful. Therefore, for the rest of this lab, sensor noise was ignored, but the other non-ideal characteristics were left in.</p>
+									<p>To assess the sensitivity of the controller designed to deal with the deadband, the gain matrix was hard coded in so that it would not be recalculated with the perturbed parameters. Then parameters for the system were changed slightly until the controller was no longer to keep the pendulum up, or the simulation broke.</p>
+									<p>The controller was able to work individually for the positive and negative parameter changes tabulated below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab11/img/table3.png" alt="" />
+									<br>
+									<p>It can be seen that the controller is fairly robust to all parameters inaccuracies other than the damping coefficient. This is concerning because the damping coefficient would be the hardest parameter to measure for the real car.</p>
+									<p>Some other factors that would potentially cause the controller to fail in the real system are listed below.</p>
+									<ul>
+										<li>Backlash in the physical system</li>
+										<li>Slow runtime for the control loop on the microcontroller</li>
+										<li>Limited power resulting from the battery dying</li>
+									</ul>
+									<br>
                                     <button class="btn btn-dark" data-dismiss="modal">
                                         <i class="fas fa-times fa-fw"></i>
                                         Close Window
