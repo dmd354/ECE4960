@@ -3245,10 +3245,124 @@ measurement = curr_state + noise
                                     <div class="divider-custom">
                                         <div class="divider-custom-line"></div>
                                     </div>
-                                    <!-- Lab Modal - Image-->
-                                    <!--<img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="" />-->
-                                    <!-- Lab Modal - Text-->
-                                    <p class="mb-5">Coming soon...</p>
+                                    <h3>Abstract</h3>
+									<br>
+									<p>In this lab, linear quadratic estimation was explored on a simulated cart-pendulum system similar to that used in Lab 11.</p>
+									<br>
+									<h3>Kalman Filter</h3>
+									<br>
+									<p>The provided filter uses different A and B matrices than the simulation because it is a discrete filter, and the A and B matrices previously describe the continuous-time system. Therefore the matrices need to be converted into discrete form.</p>
+									<p>The C matrix defined in the pendulumParam.py file is [0, 0, 0, 1] implying that the angular velocity of the pendulum (thetadot) is measured directly.</p>
+									<p>Without making any changes to the code, the simulation file threw the following error.</p>
+									<br>
+									<pre><code>
+/home/artemis/Downloads/ECE4960_Lab12b/runSimulation.py:47: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray
+  new_state=old_state + np.array(pendulum.cartpendfunc(old_state,u)) * dt
+AttributeError: 'float' object has no attribute 'sin'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/artemis/Downloads/ECE4960_Lab12b/runSimulation.py", line 47, in <module>
+    new_state=old_state + np.array(pendulum.cartpendfunc(old_state,u)) * dt
+  File "/home/artemis/Downloads/ECE4960_Lab12b/pendulumNonlinearDynamics.py", line 48, in cartpendfunc
+    Sy = np.sin(theta)
+TypeError: loop of ufunc does not support argument 0 of type float which has no callable sin method
+									</code></pre>
+									<br>
+									<p>This was fixed by replacing the instances where theta was referenced with <code>theta[0]</code>.</p>
+									<p>The otherwise unmodified simulation can be seen running below.</p>
+									<br>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/LiklUlUGGTc" allowfullscreen></iframe>
+									</div>
+									<br>
+									<p>It can be seen that the Kalman Filter Easily Estimates the state.</p>
+									<p>By using the line <code>control.obsv(A,C)</code> the observability Matrix of the system was found to be [0 0 0 1; 0 -1.36 8.62 0; 0 2.23 -0.84 8.62; 0 -15.36 75.68 -0.84]. Since this matrix had a column of all zeros, it is clearly rank deficient, but to confirm, <code>np.linalg.matrix_rank(control.obsv(A,C))</code> was run and the matrix was found to have a rank of 3 indicating that not all state are observable. Despite this, the Kalman Filter is able to work because it uses the model to predict the state and in this case, the model of the state perfectly matches the simulated model, so it predicts perfectly.</p>
+									<p>By looking at the A and C matrices, it can be seen that the position, z, is the unobservable state since the first column of both matrices is all zeros.</p>
+									<p>The initial guess of the states was slightly augmented with the line, <code>mu = np.array([[P.z0+0.5], [P.zdot0+0.1], [P.theta0+0.1], [P.thetadot0+0.1]])</code>, giving the following plot.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab12/img/wrong_ic.png" alt="" />
+									<br>
+									<p>The incorrect guess caused a little trouble at first, but the system was able to quickly correct its estimate of all of the states other than z which was not able to be corrected and maintained a bias due to it being unobservable.</p>
+									<p>To plot the uncertainty for each state, a new variable was made to pull the diagonals of the sigma value for each time step, and a copy of the plotting script  function was modified to plot these values. The plot of the uncertainties can be seen below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab12/img/uncertainties.png" alt="" />
+									<br>
+									<p>It can be seen that the uncertainty associated with z rises linearly since it is unobservable and its estimate can’t be updated by the sensor measurements. The other sigma values initially rise, and then remain constant. This indicates that we are initialising with much more confidence than the filter’s steady-state.</p>
+									<br>
+									<h3>Imperfections and Adjusting the Kalman Filter</h3>
+									<br>
+									<p>As shown in the previous section, The Kalman filter is able to quickly recover from an incorrect initial state. In the case I tested, the estimate converged to the true position within the first 2 seconds of the simulation for all states other than the position which remained off.</p>
+									<p>The input deadband and saturation values were implemented similarly to how they were in Lab 11 with the following lines.</p>
+									<br>
+									<pre><code>
+u_max = 2.019
+u_min = 0.395
+U_ctr = -Kr.dot(mu-des_state)  
+if abs(u_ctr)&lt;u_min:
+	u = 0 
+elif abs(u_ctr)>u_max:
+	u = np.sign(u_ctr)*u_max 
+else:
+	u = u_ctr
+									</code></pre>
+									<br>
+									<p>These limits gave the following response.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab12/img/limits.png" alt="" />
+									<br>
+									<p>With these limits imposed, the controller was still able to keep the pendulum upright, but the position ended up drifting to the right. It can be seen that the Kalman filter does a good job of estimating all of the states other than z which is as I would expect.</p>
+									<p>Process noise was added to the simulation by uncommenting the following line in pendulumNonlinearDynamics.py.</p>
+									<br>
+									<pre><code>
+dydt = [ydot0 + np.random.randn()*0.01, ydot1 + np.random.randn()*0.01, ydot2 + np.random.randn()*0.01, ydot3 + np.random.randn()*0.01]
+									</code></pre>
+									<br>
+									<p>With just process noise, the filter is still able to estimate the state well, and the controller is able to keep the pendulum up as seen in the plot below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab12/img/p_noise.png" alt="" />
+									<br>
+									<p>Sensor noise was then implemented by adding a random value to the measurement with the following line.</p>
+									<br>
+									<pre><code>
+y_kf = P.C.dot(old_state) + np.random.randn()*0.01
+									</code></pre>
+									<br>
+									<p>This gave the response plotted below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab12/img/s_noise.png" alt="" />
+									<br>
+									<p>To simulate an inaccurate model in the filter, the A and B matrices were increased by 1% using the following lines in the kalmanFilter.py code.</p>
+									<br>
+									<pre><code>
+Ad = scipy.linalg.expm(P.A*P.T_update)
+Ad = 1.01*Ad
+Bd = P.B*P.T_update
+Bd = 1.01*Bd
+									</code></pre>
+									<br>
+									<p>This 1% change caused the Kalman filter to no longer accurately estimate the state and the system went unstable. By reducing the change in the matrices, to 0.01% the system was able to stabilize again, and gave the following plot.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab12/img/p01change.png" alt="" />
+									<br>
+									<p>I increased the value of sigma_u by 20 times so that the filter would trust the sensor measurements more than the model-based predictions, and the system was able to keep the pendulum up with A and B matrices augmented by 0.03%. This may not seem like a lot, but with my implementation, every single term in the discrete system matrices is increased by this amount making for a pretty poor model. The plot for this run can be seen below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab12/img/p03change.png" alt="" />
+									<br>
+									<p>It can be seen that the pendulum is kept upright, but the cart ends up moving a lot.</p>
+									<p>The value of T_update was adjusted in pendulumParam.py to find how slow the update time could be made without the pendulum falling over. I was able to increase the update time to as large as 0.05s (50x slower than initial update rate) without the controller failing to keep the pendulum up. The plot of the simulation with this update rate is shown below.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab12/img/T0p05.png" alt="" />
+									<br>
+									<p>The following video shows the final simulation of this system that is associated with the above plot. It should be noted that this simulation includes the control limits, sensor noise, process noise, an inaccurate model, and a slow update rate.</p>
+									<br>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/m0uz6qtqsLg" allowfullscreen></iframe>
+									</div>
+									<br>
+									<p>With all of these imperfections, I think that it would be possible for my real robot to balance the pendulum. The simulation includes most of the major non-ideal characteristics of the real robot, and was able to run without me having to do that much tuning on the filter or controller. However, I think it would take a lot of effort, and a lot of tuning to get the robot to balance the pendulum since the model for the robot wasn’t exactly captured by the simulation, and excessive amounts of tuning seems to have been the theme for most of the labs I have done with the robot.</p>
+									
 									
 									<p></p>
 									
