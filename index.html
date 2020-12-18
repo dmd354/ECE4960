@@ -3362,20 +3362,58 @@ Bd = 1.01*Bd
 									</div>
 									<br>
 									<p>With all of these imperfections, I think that it would be possible for my real robot to balance the pendulum. The simulation includes most of the major non-ideal characteristics of the real robot, and was able to run without me having to do that much tuning on the filter or controller. However, I think it would take a lot of effort, and a lot of tuning to get the robot to balance the pendulum since the model for the robot wasn’t exactly captured by the simulation, and excessive amounts of tuning seems to have been the theme for most of the labs I have done with the robot.</p>
-									
-									
-									<p></p>
-									
+									<br>
+									<h3>Changing Measurements</h3>
+									<br>
+									<p>To simulate measurements of z obtained from the ToF sensor as well as thetadot from the gyroscope, the C matrix in pendulumParam.py was modified as follows.</p>
 									<br>
 									<pre><code>
-
+#measure z and thetadot
+C = np.matrix([[1.0, 0.0, 0.0, 0.0],[0.0, 0.0, 0.0, 1.0]])
 									</code></pre>
 									<br>
-									
+									<p>Noise was added to both measurements by changing the random noise generated to be a 2x1 array that would add appropriate noise to both measurements:</p>
 									<br>
-									<img class="img-fluid mb-5" src="Lab12/img/_.png" alt="" />
+									<pre><code>
+y_kf = P.C.dot(old_state) + np.random.randn(2,1)*0.01
+									</code></pre>
 									<br>
-									
+									<p>With these changes, and having both measurements update at 100Hz (T_update=0.01), the following response was observed.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab12/img/Two_measured_sync.png" alt="" />
+									<br>
+									<p>It can be seen that the z estimate no longer remains offset from the truth as it is now observable. It can also be noted that now the observability matrix made from A and the new C matrix is now full rank.</p>
+									<p>More realistically, the z measurement would only be measured at 10 Hz. To have the filter only update with the z measurement at 10 Hz, a counter was added to the simulation file to count how many Kalman updates had been performed, and have the filter only use both measurements every 10 updates. To implement this, the Kalman filter function was changed to be the following.</p>
+									<br>
+									<pre><code>
+def kalmanFilter(mu, sigma, u, y, count):
+	if count%10==0: #10Hz update
+		C_KF = P.C  # use full C matric
+		y_KF = y #use both measurements
+	else: #100Hz update
+		C_KF = P.C[1,:] # only use thetadot row of C matrix
+		y_KF = y[1,:] # only use thetadot measurement
+	# Prediction
+	mu_p = Ad.dot(mu) + Bd.dot(u) 
+	sigma_p = Ad.dot(sigma.dot(Ad.transpose())) + sigma_u
+	# Kalman Gain
+	y_m = y_KF-C_KF.dot(mu_p)
+	sigma_m = C_KF.dot(sigma_p.dot(C_KF.transpose())) + sigma_n
+	kkf_gain = sigma_p.dot(C_KF.transpose().dot(np.linalg.inv(sigma_m)))
+	# Update
+	mu = mu_p + kkf_gain.dot(y_m)    
+	sigma=(np.eye(4)-kkf_gain.dot(C_KF)).dot(sigma_p)
+	return mu,sigma
+									</code></pre>
+									<br>
+									<p>The performance of the system with all of the non-ideal characteristics developed as well as measuring z and thetadot at different frequencies can be seen in the following plot and video.</p>
+									<br>
+									<div class="embed-responsive embed-responsive-16by9">
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/mp1ngTgV9HI" allowfullscreen></iframe>
+									</div>
+									<br>
+									<p>Now that the z-measurement is only updating every 0.01 seconds, it can be seen that the noise in the z estimate is less frequently visible in the plot. The addition of this measurement doesn’t dramatically improve the system's ability to keep the pendulum up, but it does provide some improvement to the estimate, and makes the system observable. If the position of the cart was a more important aspect of this system, this measurement would be essential.</p>
+									<br>
                                     <button class="btn btn-dark" data-dismiss="modal">
                                         <i class="fas fa-times fa-fw"></i>
                                         Close Window
