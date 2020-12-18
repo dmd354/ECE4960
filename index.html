@@ -3380,7 +3380,7 @@ y_kf = P.C.dot(old_state) + np.random.randn(2,1)*0.01
 									<br>
 									<p>With these changes, and having both measurements update at 100Hz (T_update=0.01), the following response was observed.</p>
 									<br>
-									<img class="img-fluid mb-5" src="Lab12/img/Two_measured_sync.png" alt="" />
+									<img class="img-fluid mb-5" src="Lab12/img/two_measured_sync.png" alt="" />
 									<br>
 									<p>It can be seen that the z estimate no longer remains offset from the truth as it is now observable. It can also be noted that now the observability matrix made from A and the new C matrix is now full rank.</p>
 									<p>More realistically, the z measurement would only be measured at 10 Hz. To have the filter only update with the z measurement at 10 Hz, a counter was added to the simulation file to count how many Kalman updates had been performed, and have the filter only use both measurements every 10 updates. To implement this, the Kalman filter function was changed to be the following.</p>
@@ -3407,6 +3407,9 @@ def kalmanFilter(mu, sigma, u, y, count):
 									</code></pre>
 									<br>
 									<p>The performance of the system with all of the non-ideal characteristics developed as well as measuring z and thetadot at different frequencies can be seen in the following plot and video.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab12/img/two_measured_async.png" alt="" />
+									<br>
 									<br>
 									<div class="embed-responsive embed-responsive-16by9">
 										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/mp1ngTgV9HI" allowfullscreen></iframe>
