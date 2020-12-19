@@ -3251,8 +3251,8 @@ measurement = curr_state + noise
 									<br>
 									<h3>Kalman Filter</h3>
 									<br>
-									<p>The provided filter uses different A and B matrices than the simulation because it is a discrete filter, and the A and B matrices previously describe the continuous-time system. Therefore the matrices need to be converted into discrete form.</p>
-									<p>The C matrix defined in the pendulumParam.py file is [0, 0, 0, 1] implying that the angular velocity of the pendulum (thetadot) is measured directly.</p>
+									<p>The provided filter uses different A and B matrices than the simulation because it is a discrete filter, and the previously defined A and B matrices describe the continuous-time system. Therefore the matrices need to be converted into discrete form.</p>
+									<p>The C matrix defined in the pendulumParam.py file is [0, 0, 0, 1] implying that the angular velocity of the pendulum (thetadot) is measured directly. The Kalman filter estimates the entire state space from this measurement and the system model.</p>
 									<p>Without making any changes to the code, the simulation file threw the following error.</p>
 									<br>
 									<pre><code>
@@ -3278,7 +3278,7 @@ TypeError: loop of ufunc does not support argument 0 of type float which has no 
 									</div>
 									<br>
 									<p>It can be seen that the Kalman Filter Easily Estimates the state.</p>
-									<p>By using the line <code>control.obsv(A,C)</code> the observability Matrix of the system was found to be [0 0 0 1; 0 -1.36 8.62 0; 0 2.23 -0.84 8.62; 0 -15.36 75.68 -0.84]. Since this matrix had a column of all zeros, it is clearly rank deficient, but to confirm, <code>np.linalg.matrix_rank(control.obsv(A,C))</code> was run and the matrix was found to have a rank of 3 indicating that not all state are observable. Despite this, the Kalman Filter is able to work because it uses the model to predict the state and in this case, the model of the state perfectly matches the simulated model, so it predicts perfectly.</p>
+									<p>By using the line <code>control.obsv(A,C)</code> the observability Matrix of the system was found to be [0 0 0 1; 0 -1.36 8.62 0; 0 2.23 -0.84 8.62; 0 -15.36 75.68 -0.84]. Since this matrix had a column of all zeros, it is clearly rank deficient, but to confirm, <code>np.linalg.matrix_rank(control.obsv(A,C))</code> was run and the matrix was found to have a rank of 3 indicating that not all state are observable. Despite this, the Kalman Filter is able to work because it uses the model to predict the state and in this case, the model of the state almose perfectly matches the simulated model, so it predicts very well.</p>
 									<p>By looking at the A and C matrices, it can be seen that the position, z, is the unobservable state since the first column of both matrices is all zeros.</p>
 									<p>The initial guess of the states was slightly augmented with the line, <code>mu = np.array([[P.z0+0.5], [P.zdot0+0.1], [P.theta0+0.1], [P.thetadot0+0.1]])</code>, giving the following plot.</p>
 									<br>
@@ -3312,7 +3312,7 @@ else:
 									<br>
 									<img class="img-fluid mb-5" src="Lab12/img/limits.png" alt="" />
 									<br>
-									<p>With these limits imposed, the controller was still able to keep the pendulum upright, but the position ended up drifting to the right. It can be seen that the Kalman filter does a good job of estimating all of the states other than z which is as I would expect.</p>
+									<p>With these limits imposed, the controller was still able to keep the pendulum upright, but the position ended up drifting to the right. It can be seen that the Kalman filter still does a good job of estimating the state since it is being given the actual control input and not the ideal one to make its predictions.</p>
 									<p>Process noise was added to the simulation by uncommenting the following line in pendulumNonlinearDynamics.py.</p>
 									<br>
 									<pre><code>
@@ -3333,6 +3333,7 @@ y_kf = P.C.dot(old_state) + np.random.randn()*0.01
 									<br>
 									<img class="img-fluid mb-5" src="Lab12/img/s_noise.png" alt="" />
 									<br>
+									<p>The Kalman filter is still able to estimate the state pretty well with sensor and process noise, but the estimate becomes noisier.</p>
 									<p>To simulate an inaccurate model in the filter, the A and B matrices were increased by 1% using the following lines in the kalmanFilter.py code.</p>
 									<br>
 									<pre><code>
@@ -3355,10 +3356,12 @@ Bd = 1.01*Bd
 									<br>
 									<img class="img-fluid mb-5" src="Lab12/img/T0p05.png" alt="" />
 									<br>
-									<p>The following video shows the final simulation of this system that is associated with the above plot. It should be noted that this simulation includes the control limits, sensor noise, process noise, an inaccurate model, and a slow update rate.</p>
+									<p>At this point, I added back in the inaccurate state initialization. The following video and plot shows the final simulation of the system when only measuring thetadot. It should be noted that this simulation includes an inaccurate state initialization, the control limits, sensor noise, process noise, an inaccurate model, and a slow update rate.</p>
+									<br>
+									<img class="img-fluid mb-5" src="Lab12/img/final_one_meas.png" alt="" />
 									<br>
 									<div class="embed-responsive embed-responsive-16by9">
-										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/m0uz6qtqsLg" allowfullscreen></iframe>
+										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/hQhvM6wE29U" allowfullscreen></iframe>
 									</div>
 									<br>
 									<p>With all of these imperfections, I think that it would be possible for my real robot to balance the pendulum. The simulation includes most of the major non-ideal characteristics of the real robot, and was able to run without me having to do that much tuning on the filter or controller. However, I think it would take a lot of effort, and a lot of tuning to get the robot to balance the pendulum since the model for the robot wasn’t exactly captured by the simulation, and excessive amounts of tuning seems to have been the theme for most of the labs I have done with the robot.</p>
@@ -3375,12 +3378,12 @@ C = np.matrix([[1.0, 0.0, 0.0, 0.0],[0.0, 0.0, 0.0, 1.0]])
 									<p>Noise was added to both measurements by changing the random noise generated to be a 2x1 array that would add appropriate noise to both measurements:</p>
 									<br>
 									<pre><code>
-y_kf = P.C.dot(old_state) + np.random.randn(2,1)*0.01
+y_kf = P.C.dot(old_state) + np.array([[np.random.randn()*0.1],[np.random.randn()*0.01]])
 									</code></pre>
 									<br>
 									<p>With these changes, and having both measurements update at 100Hz (T_update=0.01), the following response was observed.</p>
 									<br>
-									<img class="img-fluid mb-5" src="Lab12/img/two_measured_sync.png" alt="" />
+									<img class="img-fluid mb-5" src="Lab12/img/two_measured_sync2.png" alt="" />
 									<br>
 									<p>It can be seen that the z estimate no longer remains offset from the truth as it is now observable. It can also be noted that now the observability matrix made from A and the new C matrix is now full rank.</p>
 									<p>More realistically, the z measurement would only be measured at 10 Hz. To have the filter only update with the z measurement at 10 Hz, a counter was added to the simulation file to count how many Kalman updates had been performed, and have the filter only use both measurements every 10 updates. To implement this, the Kalman filter function was changed to be the following.</p>
@@ -3408,7 +3411,7 @@ def kalmanFilter(mu, sigma, u, y, count):
 									<br>
 									<p>The performance of the system with all of the non-ideal characteristics developed as well as measuring z and thetadot at different frequencies can be seen in the following plot and video.</p>
 									<br>
-									<img class="img-fluid mb-5" src="Lab12/img/two_measured_async.png" alt="" />
+									<img class="img-fluid mb-5" src="Lab12/img/two_measured_async2.png" alt="" />
 									<br>
 									<br>
 									<div class="embed-responsive embed-responsive-16by9">
