@@ -159,7 +159,7 @@
                             <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
                                 <div class="portfolio-item-caption-content text-center text-white"></div>
                             </div>
-                            <p style="font-size:25px">Lab 11 (Inverted Pendulum)</p>
+                            <p style="font-size:25px">Lab 11 (LQR)</p>
                         </div>
                     </div>
 					<!-- Lab 12-->
@@ -168,7 +168,7 @@
                             <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
                                 <div class="portfolio-item-caption-content text-center text-white"></div>
                             </div>
-                            <p style="font-size:25px">Lab 12 (Inverted Pendulum)</p>
+                            <p style="font-size:25px">Lab 12 (LQG)</p>
                         </div>
                     </div>
 				</div>
@@ -3278,7 +3278,7 @@ TypeError: loop of ufunc does not support argument 0 of type float which has no 
 									</div>
 									<br>
 									<p>It can be seen that the Kalman Filter Easily Estimates the state.</p>
-									<p>By using the line <code>control.obsv(A,C)</code> the observability Matrix of the system was found to be [0 0 0 1; 0 -1.36 8.62 0; 0 2.23 -0.84 8.62; 0 -15.36 75.68 -0.84]. Since this matrix had a column of all zeros, it is clearly rank deficient, but to confirm, <code>np.linalg.matrix_rank(control.obsv(A,C))</code> was run and the matrix was found to have a rank of 3 indicating that not all state are observable. Despite this, the Kalman Filter is able to work because it uses the model to predict the state and in this case, the model of the state almose perfectly matches the simulated model, so it predicts very well.</p>
+									<p>By using the line <code>control.obsv(A,C)</code> the observability Matrix of the system was found to be [0 0 0 1; 0 -1.36 8.62 0; 0 2.23 -0.84 8.62; 0 -15.36 75.68 -0.84]. Since this matrix had a column of all zeros, it is clearly rank deficient, but to confirm, <code>np.linalg.matrix_rank(control.obsv(A,C))</code> was run and the matrix was found to have a rank of 3 indicating that not all state are observable. Despite this, the Kalman Filter is able to work because it uses the model to predict the state and in this case, the model almost perfectly matches the simulated model, so it predicts very well.</p>
 									<p>By looking at the A and C matrices, it can be seen that the position, z, is the unobservable state since the first column of both matrices is all zeros.</p>
 									<p>The initial guess of the states was slightly augmented with the line, <code>mu = np.array([[P.z0+0.5], [P.zdot0+0.1], [P.theta0+0.1], [P.thetadot0+0.1]])</code>, giving the following plot.</p>
 									<br>
@@ -3356,7 +3356,7 @@ Bd = 1.01*Bd
 									<br>
 									<img class="img-fluid mb-5" src="Lab12/img/T0p05.png" alt="" />
 									<br>
-									<p>At this point, I added back in the inaccurate state initialization. The following video and plot shows the final simulation of the system when only measuring thetadot. It should be noted that this simulation includes an inaccurate state initialization, the control limits, sensor noise, process noise, an inaccurate model, and a slow update rate.</p>
+									<p>At this point, I added back in the inaccurate state initialization. The following video and plot show the final simulation of the system when only measuring thetadot. It should be noted that this simulation includes an inaccurate state initialization, the control limits, sensor noise, process noise, an inaccurate model, and a slow update rate.</p>
 									<br>
 									<img class="img-fluid mb-5" src="Lab12/img/final_one_meas.png" alt="" />
 									<br>
@@ -3418,7 +3418,7 @@ def kalmanFilter(mu, sigma, u, y, count):
 										<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/mp1ngTgV9HI" allowfullscreen></iframe>
 									</div>
 									<br>
-									<p>Now that the z-measurement is only updating every 0.01 seconds, it can be seen that the noise in the z estimate is less frequently visible in the plot. The addition of this measurement doesn’t dramatically improve the system's ability to keep the pendulum up, but it does provide some improvement to the estimate, and makes the system observable. If the position of the cart was a more important aspect of this system, this measurement would be essential.</p>
+									<p>Now that the z-measurement is only updating every 0.1 seconds, it can be seen that the noise in the z estimate is less frequently visible in the plot. The addition of this measurement doesn’t dramatically improve the system's ability to keep the pendulum up, but it does provide some improvement to the estimate, and makes the system observable. If the position of the cart was a more important aspect of this system, this measurement would be essential.</p>
 									<br>
                                     <button class="btn btn-dark" data-dismiss="modal">
                                         <i class="fas fa-times fa-fw"></i>
